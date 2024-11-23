@@ -13,7 +13,10 @@ const Info = () => {
           {/* About Section */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-3xl font-bold text-hospital-dark">About Our Healthcare System</CardTitle>
+              <div className="flex items-center gap-2">
+                <CardTitle className="text-3xl font-bold text-hospital-dark">About Our Healthcare System</CardTitle>
+                <span className="px-2 py-1 text-sm bg-hospital-primary text-white rounded-full">#10</span>
+              </div>
               <CardDescription>Your trusted partner in healthcare management</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
