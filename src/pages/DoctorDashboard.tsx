@@ -8,6 +8,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import Sidebar from "@/components/Sidebar";
 import { toast } from "sonner";
+import { useQuery } from "@tanstack/react-query";
+import { fetchPatientSymptoms } from "@/lib/api";
+import { Checkbox } from "@/components/ui/checkbox";
 
 // Mock data for medicines
 const medicines = [
@@ -21,6 +24,7 @@ const prescriptionSchema = z.object({
   patientId: z.string().min(1, "Please select a patient"),
   medicineId: z.string().min(1, "Please select a medicine"),
   prescription: z.string().min(10, "Prescription details required"),
+  selectedSymptoms: z.array(z.string()).min(1, "Please select at least one symptom"),
 });
 
 const DoctorDashboard = () => {
@@ -30,7 +34,13 @@ const DoctorDashboard = () => {
       patientId: "",
       medicineId: "",
       prescription: "",
+      selectedSymptoms: [],
     },
+  });
+
+  const { data: symptoms, isLoading: symptomsLoading } = useQuery({
+    queryKey: ['symptoms'],
+    queryFn: fetchPatientSymptoms,
   });
 
   const onSubmit = (values: z.infer<typeof prescriptionSchema>) => {
@@ -40,8 +50,8 @@ const DoctorDashboard = () => {
 
   // Mock patient data - replace with actual API call
   const patients = [
-    { id: "1", name: "John Doe", symptoms: "Fever and headache" },
-    { id: "2", name: "Jane Smith", symptoms: "Cough and sore throat" },
+    { id: "1", name: "John Doe" },
+    { id: "2", name: "Jane Smith" },
   ];
 
   const selectedMedicine = medicines.find(med => med.id === form.watch("medicineId"));
@@ -60,7 +70,36 @@ const DoctorDashboard = () => {
                   <CardTitle>Patient: {patient.name}</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-gray-600">{patient.symptoms}</p>
+                  {symptomsLoading ? (
+                    <p>Loading symptoms...</p>
+                  ) : (
+                    <div className="space-y-2">
+                      {symptoms?.map((symptom: { id: string; name: string }) => (
+                        <div key={symptom.id} className="flex items-center space-x-2">
+                          <Checkbox
+                            id={`symptom-${symptom.id}`}
+                            onCheckedChange={(checked) => {
+                              const currentSymptoms = form.getValues("selectedSymptoms");
+                              if (checked) {
+                                form.setValue("selectedSymptoms", [...currentSymptoms, symptom.id]);
+                              } else {
+                                form.setValue(
+                                  "selectedSymptoms",
+                                  currentSymptoms.filter((id) => id !== symptom.id)
+                                );
+                              }
+                            }}
+                          />
+                          <label
+                            htmlFor={`symptom-${symptom.id}`}
+                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                          >
+                            {symptom.name}
+                          </label>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             ))}
