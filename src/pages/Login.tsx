@@ -68,6 +68,11 @@ const Login = () => {
                   </Button>
                 </form>
               </Form>
+              <div className="mt-4 text-center">
+                <Button variant="link" onClick={() => navigate("/register")}>
+                  Don't have an account? Register
+                </Button>
+              </div>
             </div>
           </div>
         </div>
