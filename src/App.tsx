@@ -9,6 +9,7 @@ import Register from "./pages/Register";
 import PatientDashboard from "./pages/PatientDashboard";
 import DoctorDashboard from "./pages/DoctorDashboard";
 import PharmacistDashboard from "./pages/PharmacistDashboard";
+import Information from "./pages/Information";
 
 const queryClient = new QueryClient();
 
@@ -25,6 +26,7 @@ const App = () => (
           <Route path="/patient-dashboard" element={<PatientDashboard />} />
           <Route path="/doctor-dashboard" element={<DoctorDashboard />} />
           <Route path="/pharmacist-dashboard" element={<PharmacistDashboard />} />
+          <Route path="/info" element={<Information />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
