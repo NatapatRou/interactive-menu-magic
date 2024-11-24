@@ -17,8 +17,5 @@
             return json_encode($users);
         }             
     }
-
-    $API = new API;
-    header("Content-Type: application/json");
-    header("Access-Control-Allow-Origin: application/json");
+    return $API = new API;
 ?>
