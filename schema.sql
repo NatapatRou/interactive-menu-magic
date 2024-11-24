@@ -12,7 +12,7 @@ DROP TABLE IF EXISTS User;
 
 -- Step 1: Create the Subtype Table `Doctor`
 CREATE TABLE Doctor (
-    doctor_id INT AUTO_INCREMENT PRIMARY KEY,
+    id INT AUTO_INCREMENT PRIMARY KEY,
 	fname VARCHAR(255) NOT NULL,
     lname VARCHAR(255) NOT NULL,
 	gender VARCHAR(10) NOT NULL,
@@ -21,12 +21,14 @@ CREATE TABLE Doctor (
     password VARCHAR(255) NOT NULL,
     date_register DATE DEFAULT (CURRENT_DATE),
     specialization VARCHAR(100),
-    license_number VARCHAR(50) UNIQUE
+    license_number VARCHAR(50) UNIQUE,
+    role varchar(255) GENERATED ALWAYS AS ('Doctor') VIRTUAL,
+    auth varchar(255) GENERATED ALWAYS AS ('User') VIRTUAL
 );
 
 -- Step 2: Create the Subtype Table `Patient`
 CREATE TABLE Patient (
-    patient_id INT AUTO_INCREMENT PRIMARY KEY,
+    id INT AUTO_INCREMENT PRIMARY KEY,
 	fname VARCHAR(255) NOT NULL,
     lname VARCHAR(255) NOT NULL,
 	gender VARCHAR(10) NOT NULL,
@@ -36,12 +38,14 @@ CREATE TABLE Patient (
     password VARCHAR(255) NOT NULL,
     date_register DATE DEFAULT (CURRENT_DATE),
     address VARCHAR(255),
-    emergency_contact VARCHAR(255)
+    emergency_contact VARCHAR(255),
+    role varchar(255) GENERATED ALWAYS AS ('Patient') VIRTUAL,
+    auth varchar(255) GENERATED ALWAYS AS ('User') VIRTUAL
 );
 
 -- Step 3: Create the Subtype Table `Pharmacist`
 CREATE TABLE Pharmacist (
-    pharmacist_id INT AUTO_INCREMENT PRIMARY KEY,
+    id INT AUTO_INCREMENT PRIMARY KEY,
 	fname VARCHAR(255) NOT NULL,
     lname VARCHAR(255) NOT NULL,
 	gender VARCHAR(10) NOT NULL,
@@ -50,7 +54,9 @@ CREATE TABLE Pharmacist (
     password VARCHAR(255) NOT NULL,
     date_register DATE DEFAULT (CURRENT_DATE),
     license_number VARCHAR(50) UNIQUE,
-    work_shift ENUM('Morning', 'Afternoon', 'Night')
+    work_shift ENUM('Morning', 'Afternoon', 'Night'),
+    role varchar(255) GENERATED ALWAYS AS ('Pharmacist') VIRTUAL,
+    auth varchar(255) GENERATED ALWAYS AS ('User') VIRTUAL
 );
 
 -- Drop tables if they exist to prevent conflicts on re-run
@@ -83,9 +89,9 @@ CREATE TABLE Prescription (
     status ENUM('Pending', 'Confirmed', 'Dispensed') DEFAULT 'Pending',
     notes TEXT,
     dosage_instructions TEXT,
-    CONSTRAINT fk_PresDoc FOREIGN KEY (doctor_id) REFERENCES Doctor(doctor_id) ON DELETE CASCADE,
-    CONSTRAINT fk_PresPatient FOREIGN KEY (patient_id) REFERENCES Patient(patient_id) ON DELETE CASCADE,
-    CONSTRAINT fk_PresParma FOREIGN KEY (pharmacist_id) REFERENCES Pharmacist(pharmacist_id) ON DELETE CASCADE
+    CONSTRAINT fk_PresDoc FOREIGN KEY (doctor_id) REFERENCES Doctor(id) ON DELETE CASCADE,
+    CONSTRAINT fk_PresPatient FOREIGN KEY (patient_id) REFERENCES Patient(id) ON DELETE CASCADE,
+    CONSTRAINT fk_PresParma FOREIGN KEY (pharmacist_id) REFERENCES Pharmacist(id) ON DELETE CASCADE
 );
 
 -- Create Symptom_statement Table
@@ -94,7 +100,7 @@ CREATE TABLE Symptom_statament(
     patient_id INT NOT NULL,
     date_issued DATE DEFAULT (CURRENT_DATE),
 	sym_description TEXT,
-    CONSTRAINT fk_PatientSym FOREIGN KEY (patient_id) REFERENCES Patient(patient_id) ON DELETE CASCADE
+    CONSTRAINT fk_PatientSym FOREIGN KEY (patient_id) REFERENCES Patient(id) ON DELETE CASCADE
 );
 
 -- Create  Table Medication_detail
@@ -107,7 +113,7 @@ CREATE TABLE Medication_datail(
 );
 
 
-INSERT INTO Doctor (doctor_id, fname, lname, gender, contact_info, email, password, specialization, license_number)
+INSERT INTO Doctor (id, fname, lname, gender, contact_info, email, password, specialization, license_number)
 VALUES
 (1, 'John', 'Doe', 'Male', '555-1234', 'johndoe@example.com', 'password123', 'Cardiology', 'DOC12345'),
 (2, 'Alice', 'Smith', 'Female', '555-5678', 'alicesmith@example.com', 'password456', 'Neurology', 'DOC12346'),
@@ -120,7 +126,7 @@ VALUES
 (9, 'William', 'Moore', 'Male', '555-7788', 'williammoore@example.com', 'password106', 'Surgery', 'DOC12353'),
 (10, 'Sophia', 'Anderson', 'Female', '555-9900', 'sophiaanderson@example.com', 'password107', 'Endocrinology', 'DOC12354');
 
-INSERT INTO Patient (patient_id, fname, lname, gender, date_of_birth, contact_info, email, password, address, emergency_contact)
+INSERT INTO Patient (id, fname, lname, gender, date_of_birth, contact_info, email, password, address, emergency_contact)
 VALUES
 (1, 'Ethan', 'Walker', 'Male', '1985-06-15', '555-0011', 'ethanwalker@example.com', 'securepass1', '123 Main St', '555-1011'),
 (2, 'Mia', 'Hall', 'Female', '1990-03-22', '555-0022', 'miahall@example.com', 'securepass2', '456 Oak St', '555-2022'),
@@ -133,7 +139,7 @@ VALUES
 (9, 'Oliver', 'White', 'Male', '1986-01-23', '555-0099', 'oliverwhite@example.com', 'securepass9', '606 Willow St', '555-9099'),
 (10, 'Isabella', 'Martinez', 'Female', '1994-10-02', '555-0100', 'isabellamartinez@example.com', 'securepass10', '707 Aspen St', '555-0101');
 
-INSERT INTO Pharmacist (pharmacist_id, fname, lname, gender, contact_info, email, password, license_number, work_shift)
+INSERT INTO Pharmacist (id, fname, lname, gender, contact_info, email, password, license_number, work_shift)
 VALUES
 (1, 'Liam', 'Gray', 'Male', '555-1111', 'liamgray@example.com', 'pharma1', 'PHA10001', 'Morning'),
 (2, 'Sophia', 'Clark', 'Female', '555-2222', 'sophiaclark@example.com', 'pharma2', 'PHA10002', 'Afternoon'),
