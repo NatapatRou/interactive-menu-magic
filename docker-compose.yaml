@@ -1,0 +1,41 @@
+version: '3.8'
+services:
+  php-apache:
+    container_name: php-apache
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    depends_on:
+      - mysql-db
+    volumes:
+      - ./src/api:/var/www/html/
+      # - ./init_db.py:/init_db.py
+      # - ./schema.sql:/schema.sql
+    # entrypoint: ["sh", "-c", "python3 /init_db.py && apache2-foreground"]
+    ports:
+      - 8081:80
+
+
+  mysql-db:
+    container_name: mysql-db
+    image: mysql 
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root 
+      # MYSQL_DATABASE: med_disperse
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: admin
+    ports:
+      - "9906:3306"
+    volumes:
+      - ./schema.sql:/docker-entrypoint-initdb.d/schema.sql
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    ports:
+      - "8000:80"
+    restart: always
+    environment:
+      PMA_HOST: mysql-db
+    depends_on:
+      - mysql-db
