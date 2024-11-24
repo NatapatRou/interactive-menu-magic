@@ -17,5 +17,6 @@
             return json_encode($users);
         }             
     }
+
     return $API = new API;
 ?>

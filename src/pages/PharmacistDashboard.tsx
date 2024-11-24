@@ -29,6 +29,7 @@ const PharmacistDashboard = () => {
   const prescriptions = [
     { id: "1", patientName: "John Doe", medication: "Amoxicillin 500mg" },
     { id: "2", patientName: "Jane Smith", medication: "Ibuprofen 400mg" },
+    { id: "3", patientName: "uwu Smith", medication: "Ibuprofen 400mg" },
   ];
 
   return (

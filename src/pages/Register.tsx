@@ -19,6 +19,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { toast } from "sonner"; // Optional for notifications
 
 const formSchema = z.object({
   fname: z.string().min(1, "First name is required"),
@@ -49,11 +51,28 @@ const Register = () => {
     },
   });
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
-    console.log(values);
-    // Here you would typically handle registration logic
-    navigate("/login");
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    try {
+    const response = await axios.post("http://localhost:8081/register.php", values,
+        {
+        headers: {
+          "Content-Type": "application/json", // Specify JSON format
+        },
+      }
+    );
+    console.log(response);
+
+    if (response.data.status === "success") {
+      toast.success("Registration successful");
+      navigate("/login"); // Redirect to login page
+    } else {
+      toast.error(response.data.message || "Registration failed");
+    }
+  } catch (error) {
+    toast.error("An error occurred during registration");
+    console.error(error);
   };
+};
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center">

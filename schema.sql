@@ -12,7 +12,7 @@ DROP TABLE IF EXISTS User;
 
 -- Step 1: Create the Subtype Table `Doctor`
 CREATE TABLE Doctor (
-    doctor_id INT PRIMARY KEY,
+    doctor_id INT AUTO_INCREMENT PRIMARY KEY,
 	fname VARCHAR(255) NOT NULL,
     lname VARCHAR(255) NOT NULL,
 	gender VARCHAR(10) NOT NULL,
@@ -26,7 +26,7 @@ CREATE TABLE Doctor (
 
 -- Step 2: Create the Subtype Table `Patient`
 CREATE TABLE Patient (
-    patient_id INT PRIMARY KEY,
+    patient_id INT AUTO_INCREMENT PRIMARY KEY,
 	fname VARCHAR(255) NOT NULL,
     lname VARCHAR(255) NOT NULL,
 	gender VARCHAR(10) NOT NULL,
@@ -41,7 +41,7 @@ CREATE TABLE Patient (
 
 -- Step 3: Create the Subtype Table `Pharmacist`
 CREATE TABLE Pharmacist (
-    pharmacist_id INT PRIMARY KEY,
+    pharmacist_id INT AUTO_INCREMENT PRIMARY KEY,
 	fname VARCHAR(255) NOT NULL,
     lname VARCHAR(255) NOT NULL,
 	gender VARCHAR(10) NOT NULL,
