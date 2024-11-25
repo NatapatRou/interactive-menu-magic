@@ -1,5 +1,11 @@
 import { Button } from "@/components/ui/button";
-import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+} from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -20,7 +26,9 @@ const PatientDashboard = () => {
   }, []);
 
   const formSchema = z.object({
-    symptoms: z.string().min(10, "Please describe your symptoms (minimum 10 characters)"),
+    symptoms: z
+      .string()
+      .min(10, "Please describe your symptoms (minimum 10 characters)"),
   });
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -57,7 +65,9 @@ const PatientDashboard = () => {
                       />
                     </FormControl>
                     {form.formState.errors.symptoms && (
-                      <p className="text-red-500">{form.formState.errors.symptoms.message}</p>
+                      <p className="text-red-500">
+                        {form.formState.errors.symptoms.message}
+                      </p>
                     )}
                   </FormItem>
                 )}
