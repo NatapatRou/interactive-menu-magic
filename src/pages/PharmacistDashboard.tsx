@@ -1,7 +1,19 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+} from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -38,7 +50,7 @@ const PharmacistDashboard = () => {
       <div className="pl-64">
         <div className="container mx-auto px-4 py-8">
           <h1 className="text-2xl font-bold mb-6">Pharmacist Dashboard</h1>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
             {prescriptions.map((prescription) => (
               <Card key={prescription.id}>
@@ -46,7 +58,9 @@ const PharmacistDashboard = () => {
                   <CardTitle>Patient: {prescription.patientName}</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-gray-600">Medication: {prescription.medication}</p>
+                  <p className="text-gray-600">
+                    Medication: {prescription.medication}
+                  </p>
                 </CardContent>
               </Card>
             ))}
@@ -58,14 +72,20 @@ const PharmacistDashboard = () => {
             </CardHeader>
             <CardContent>
               <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                <form
+                  onSubmit={form.handleSubmit(onSubmit)}
+                  className="space-y-6"
+                >
                   <FormField
                     control={form.control}
                     name="prescriptionId"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Select Prescription</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue placeholder="Select a prescription" />
@@ -73,8 +93,12 @@ const PharmacistDashboard = () => {
                           </FormControl>
                           <SelectContent>
                             {prescriptions.map((prescription) => (
-                              <SelectItem key={prescription.id} value={prescription.id}>
-                                {prescription.patientName} - {prescription.medication}
+                              <SelectItem
+                                key={prescription.id}
+                                value={prescription.id}
+                              >
+                                {prescription.patientName} -{" "}
+                                {prescription.medication}
                               </SelectItem>
                             ))}
                           </SelectContent>
