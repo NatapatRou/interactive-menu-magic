@@ -16,13 +16,17 @@ const Information = () => {
               Healthcare Management System
             </h2>
             <p className="text-gray-600 leading-relaxed mb-6">
-              Our platform connects patients, doctors, and pharmacists in a seamless digital healthcare ecosystem. We strive to provide efficient and accessible healthcare services to everyone.
+              Our platform connects patients, doctors, and pharmacists in a
+              seamless digital healthcare ecosystem. We strive to provide
+              efficient and accessible healthcare services to everyone.
             </p>
           </div>
           {/* Features Grid */}
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             <div className="bg-white p-6 rounded-lg shadow-lg">
-              <h3 className="text-xl font-semibold mb-3 text-hospital-dark">For Patients</h3>
+              <h3 className="text-xl font-semibold mb-3 text-hospital-dark">
+                For Patients
+              </h3>
               <ul className="space-y-2 text-gray-600">
                 <li>• Easy appointment scheduling</li>
                 <li>• Access to medical history</li>
@@ -31,7 +35,9 @@ const Information = () => {
               </ul>
             </div>
             <div className="bg-white p-6 rounded-lg shadow-lg">
-              <h3 className="text-xl font-semibold mb-3 text-hospital-dark">For Doctors</h3>
+              <h3 className="text-xl font-semibold mb-3 text-hospital-dark">
+                For Doctors
+              </h3>
               <ul className="space-y-2 text-gray-600">
                 <li>• Patient management system</li>
                 <li>• Digital prescription writing</li>
@@ -40,7 +46,9 @@ const Information = () => {
               </ul>
             </div>
             <div className="bg-white p-6 rounded-lg shadow-lg">
-              <h3 className="text-xl font-semibold mb-3 text-hospital-dark">For Pharmacists</h3>
+              <h3 className="text-xl font-semibold mb-3 text-hospital-dark">
+                For Pharmacists
+              </h3>
               <ul className="space-y-2 text-gray-600">
                 <li>• Digital prescription processing</li>
                 <li>• Inventory management</li>
@@ -51,7 +59,9 @@ const Information = () => {
           </div>
           {/* Contact Section */}
           <div className="bg-white rounded-lg shadow-lg p-6">
-            <h3 className="text-xl font-semibold mb-4 text-hospital-dark">Contact Support</h3>
+            <h3 className="text-xl font-semibold mb-4 text-hospital-dark">
+              Contact Support
+            </h3>
             <div className="space-y-2 text-gray-600">
               <p>Email: support@healthcare-system.com</p>
               <p>Phone: (555) 123-4567</p>

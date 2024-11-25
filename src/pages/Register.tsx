@@ -19,6 +19,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { toast } from "sonner"; // Optional for notifications
 
 const formSchema = z.object({
   fname: z.string().min(1, "First name is required"),
@@ -49,16 +51,37 @@ const Register = () => {
     },
   });
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
-    console.log(values);
-    // Here you would typically handle registration logic
-    navigate("/login");
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    try {
+      const response = await axios.post(
+        "http://localhost:8081/register.php",
+        values,
+        {
+          headers: {
+            "Content-Type": "application/json", // Specify JSON format
+          },
+        },
+      );
+      console.log(response);
+
+      if (response.data.status === "success") {
+        toast.success("Registration successful");
+        navigate("/login"); // Redirect to login page
+      } else {
+        toast.error(response.data.message || "Registration failed");
+      }
+    } catch (error) {
+      toast.error("An error occurred during registration");
+      console.error(error);
+    }
   };
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center">
       <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
-        <h2 className="text-2xl font-bold text-center text-gray-800 mb-8">Register</h2>
+        <h2 className="text-2xl font-bold text-center text-gray-800 mb-8">
+          Register
+        </h2>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <FormField
@@ -93,7 +116,10 @@ const Register = () => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Gender</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Select gender" />
@@ -142,7 +168,11 @@ const Register = () => {
                 <FormItem>
                   <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <Input type="email" placeholder="Enter your email" {...field} />
+                    <Input
+                      type="email"
+                      placeholder="Enter your email"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -155,7 +185,11 @@ const Register = () => {
                 <FormItem>
                   <FormLabel>Password</FormLabel>
                   <FormControl>
-                    <Input type="password" placeholder="Enter your password" {...field} />
+                    <Input
+                      type="password"
+                      placeholder="Enter your password"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -187,7 +221,9 @@ const Register = () => {
                 </FormItem>
               )}
             />
-            <Button type="submit" className="w-full">Register</Button>
+            <Button type="submit" className="w-full">
+              Register
+            </Button>
           </form>
         </Form>
         <div className="mt-4 text-center">
