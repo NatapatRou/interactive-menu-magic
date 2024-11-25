@@ -43,6 +43,7 @@ const Login = () => {
           headers: {
             "Content-Type": "application/json", // Specify JSON format
           },
+          withCredentials: true,
         },
       );
       console.log(response.data);
