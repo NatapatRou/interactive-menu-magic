@@ -94,12 +94,14 @@ CREATE TABLE Prescription (
 );
 
 -- Create Symptom_statement Table
-CREATE TABLE Symptom_statament(
+CREATE TABLE Symptom_statement(
 	sym_id INT PRIMARY KEY auto_increment,
     patient_id INT NOT NULL,
+    doctor_id INT NOT NULL,
     date_issued DATE DEFAULT (CURRENT_DATE),
 	sym_description TEXT,
-    CONSTRAINT fk_PatientSym FOREIGN KEY (patient_id) REFERENCES Patient(id) ON DELETE CASCADE
+    CONSTRAINT fk_PatientSym FOREIGN KEY (patient_id) REFERENCES Patient(id) ON DELETE CASCADE,
+    CONSTRAINT fk_DoctorSym FOREIGN KEY (doctor_id) REFERENCES Doctor(id) ON DELETE CASCADE
 );
 
 -- Create  Table Medication_detail
@@ -177,18 +179,18 @@ VALUES
 (9, 9, 9, '2024-11-12', 'Confirmed', 'Pain relief', 'Take 1 tablet as needed, up to 3 times a day'),
 (10, 10, 10, '2024-11-11', 'Pending', 'General health', 'Take 1 tablet every morning');
 
-INSERT INTO Symptom_statament (patient_id, date_issued, sym_description)
-VALUES
-(1, '2024-11-20', 'Fever and chills'),
-(2, '2024-11-19', 'Severe headache and nausea'),
-(3, '2024-11-18', 'Sore throat and cough'),
-(4, '2024-11-17', 'Skin rash and itching'),
-(5, '2024-11-16', 'Frequent urination and thirst'),
-(6, '2024-11-15', 'Stomach pain and acid reflux'),
-(7, '2024-11-14', 'Chest pain during exertion'),
-(8, '2024-11-13', 'Nasal congestion and sneezing'),
-(9, '2024-11-12', 'Joint pain and swelling'),
-(10, '2024-11-11', 'Fatigue and dizziness');
+-- INSERT INTO Symptom_statament (patient_id, date_issued, sym_description)
+-- VALUES
+-- (1, '2024-11-20', 'Fever and chills'),
+-- (2, '2024-11-19', 'Severe headache and nausea'),
+-- (3, '2024-11-18', 'Sore throat and cough'),
+-- (4, '2024-11-17', 'Skin rash and itching'),
+-- (5, '2024-11-16', 'Frequent urination and thirst'),
+-- (6, '2024-11-15', 'Stomach pain and acid reflux'),
+-- (7, '2024-11-14', 'Chest pain during exertion'),
+-- (8, '2024-11-13', 'Nasal congestion and sneezing'),
+-- (9, '2024-11-12', 'Joint pain and swelling'),
+-- (10, '2024-11-11', 'Fatigue and dizziness');
 
 INSERT INTO Medication_datail (prescription_id, medication_id)
 VALUES

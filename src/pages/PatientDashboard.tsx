@@ -14,17 +14,10 @@ import Sidebar from "@/components/Sidebar";
 import { toast } from "sonner";
 import axios from "axios";
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 const PatientDashboard = () => {
-  const [data, setData] = useState([]);
-
-  useEffect(() => {
-    axios
-      .get("http://localhost:8081/patient_info.php")
-      .then((response) => setData(response.data))
-      .catch((error) => console.error("Error fetching data:", error));
-  }, []);
-
+  const navigate = useNavigate();
   const formSchema = z.object({
     symptoms: z
       .string()
@@ -38,8 +31,31 @@ const PatientDashboard = () => {
     },
   });
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
     console.log(values);
+    try {
+      const response = await axios.post(
+        "http://localhost:8081/create_symptom.php",
+        values,
+        {
+          headers: {
+            "Content-Type": "application/json", // Specify JSON format
+          },
+          withCredentials: true, // allow to send session cross domain
+        },
+      );
+      console.log(response.data);
+
+      if (response.data.status === "success") {
+        toast.success("Sended Symptoms");
+        navigate("/"); // Redirect to patient page
+      } else {
+        toast.error(response.data.message || "Sended Symptoms failed");
+      }
+    } catch (error) {
+      toast.error("An error occurred during send symptoms");
+      console.error(error);
+    }
     toast.success("Symptoms submitted successfully");
   };
 
@@ -75,16 +91,6 @@ const PatientDashboard = () => {
               <Button type="submit">Submit Symptoms</Button>
             </form>
           </Form>
-          <div className="mt-8">
-            <h2 className="text-xl font-semibold mb-4">Patient Data</h2>
-            <ul>
-              {data.map((patient, index) => (
-                <li key={index} className="mb-2">
-                  {JSON.stringify(patient)}
-                </li>
-              ))}
-            </ul>
-          </div>
         </div>
       </div>
     </div>
