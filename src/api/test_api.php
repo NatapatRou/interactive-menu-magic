@@ -3,5 +3,6 @@
     header("Content-Type: application/json");
     header("Access-Control-Allow-Origin: *");
 
-    echo $API->select_patience();
+    $result =  $API->select_all_user();
+    echo $result[0]['fname'];
 ?>
