@@ -22,6 +22,7 @@ CREATE TABLE Doctor (
     date_register DATE DEFAULT (CURRENT_DATE),
     specialization VARCHAR(100),
     license_number VARCHAR(50) UNIQUE,
+    status ENUM("Available", "Unavailable"),
     role varchar(255) GENERATED ALWAYS AS ('Doctor') VIRTUAL,
     auth varchar(255) GENERATED ALWAYS AS ('User') VIRTUAL
 );
@@ -55,6 +56,7 @@ CREATE TABLE Pharmacist (
     date_register DATE DEFAULT (CURRENT_DATE),
     license_number VARCHAR(50) UNIQUE,
     work_shift ENUM('Morning', 'Afternoon', 'Night'),
+    status ENUM("Available", "Unavailable"),
     role varchar(255) GENERATED ALWAYS AS ('Pharmacist') VIRTUAL,
     auth varchar(255) GENERATED ALWAYS AS ('User') VIRTUAL
 );
@@ -113,18 +115,18 @@ CREATE TABLE Medication_datail(
 );
 
 
-INSERT INTO Doctor (id, fname, lname, gender, contact_info, email, password, specialization, license_number)
+INSERT INTO Doctor (id, fname, lname, gender, contact_info, email, password, specialization, license_number, status)
 VALUES
-(1, 'John', 'Doe', 'Male', '555-1234', 'johndoe@example.com', 'password123', 'Cardiology', 'DOC12345'),
-(2, 'Alice', 'Smith', 'Female', '555-5678', 'alicesmith@example.com', 'password456', 'Neurology', 'DOC12346'),
-(3, 'Bob', 'Brown', 'Male', '555-9012', 'bobbrown@example.com', 'password789', 'Pediatrics', 'DOC12347'),
-(4, 'Karen', 'Taylor', 'Female', '555-3456', 'karentaylor@example.com', 'password101', 'Dermatology', 'DOC12348'),
-(5, 'Michael', 'Johnson', 'Male', '555-6789', 'michaeljohnson@example.com', 'password102', 'Oncology', 'DOC12349'),
-(6, 'Emma', 'Davis', 'Female', '555-1122', 'emmadavis@example.com', 'password103', 'Orthopedics', 'DOC12350'),
-(7, 'James', 'Wilson', 'Male', '555-3344', 'jameswilson@example.com', 'password104', 'Psychiatry', 'DOC12351'),
-(8, 'Olivia', 'Miller', 'Female', '555-5566', 'oliviamiller@example.com', 'password105', 'Gynecology', 'DOC12352'),
-(9, 'William', 'Moore', 'Male', '555-7788', 'williammoore@example.com', 'password106', 'Surgery', 'DOC12353'),
-(10, 'Sophia', 'Anderson', 'Female', '555-9900', 'sophiaanderson@example.com', 'password107', 'Endocrinology', 'DOC12354');
+(1, 'John', 'Doe', 'Male', '555-1234', 'johndoe@example.com', 'password123', 'Cardiology', 'DOC12345', 'Available'),
+(2, 'Alice', 'Smith', 'Female', '555-5678', 'alicesmith@example.com', 'password456', 'Neurology', 'DOC12346', 'Available'),
+(3, 'Bob', 'Brown', 'Male', '555-9012', 'bobbrown@example.com', 'password789', 'Pediatrics', 'DOC12347', 'Available'),
+(4, 'Karen', 'Taylor', 'Female', '555-3456', 'karentaylor@example.com', 'password101', 'Dermatology', 'DOC12348', 'Available'),
+(5, 'Michael', 'Johnson', 'Male', '555-6789', 'michaeljohnson@example.com', 'password102', 'Oncology', 'DOC12349', 'Available'),
+(6, 'Emma', 'Davis', 'Female', '555-1122', 'emmadavis@example.com', 'password103', 'Orthopedics', 'DOC12350', 'Available'),
+(7, 'James', 'Wilson', 'Male', '555-3344', 'jameswilson@example.com', 'password104', 'Psychiatry', 'DOC12351', 'Available'),
+(8, 'Olivia', 'Miller', 'Female', '555-5566', 'oliviamiller@example.com', 'password105', 'Gynecology', 'DOC12352', 'Available'),
+(9, 'William', 'Moore', 'Male', '555-7788', 'williammoore@example.com', 'password106', 'Surgery', 'DOC12353', 'Available'),
+(10, 'Sophia', 'Anderson', 'Female', '555-9900', 'sophiaanderson@example.com', 'password107', 'Endocrinology', 'DOC12354', 'Available');
 
 INSERT INTO Patient (id, fname, lname, gender, date_of_birth, contact_info, email, password, address, emergency_contact)
 VALUES
@@ -139,18 +141,18 @@ VALUES
 (9, 'Oliver', 'White', 'Male', '1986-01-23', '555-0099', 'oliverwhite@example.com', 'securepass9', '606 Willow St', '555-9099'),
 (10, 'Isabella', 'Martinez', 'Female', '1994-10-02', '555-0100', 'isabellamartinez@example.com', 'securepass10', '707 Aspen St', '555-0101');
 
-INSERT INTO Pharmacist (id, fname, lname, gender, contact_info, email, password, license_number, work_shift)
+INSERT INTO Pharmacist (id, fname, lname, gender, contact_info, email, password, license_number, work_shift, status)
 VALUES
-(1, 'Liam', 'Gray', 'Male', '555-1111', 'liamgray@example.com', 'pharma1', 'PHA10001', 'Morning'),
-(2, 'Sophia', 'Clark', 'Female', '555-2222', 'sophiaclark@example.com', 'pharma2', 'PHA10002', 'Afternoon'),
-(3, 'Mason', 'Hill', 'Male', '555-3333', 'masonhill@example.com', 'pharma3', 'PHA10003', 'Night'),
-(4, 'Ella', 'Scott', 'Female', '555-4444', 'ellascott@example.com', 'pharma4', 'PHA10004', 'Morning'),
-(5, 'James', 'Adams', 'Male', '555-5555', 'jamesadams@example.com', 'pharma5', 'PHA10005', 'Afternoon'),
-(6, 'Ava', 'Green', 'Female', '555-6666', 'avagreen@example.com', 'pharma6', 'PHA10006', 'Night'),
-(7, 'Ethan', 'Baker', 'Male', '555-7777', 'ethanbaker@example.com', 'pharma7', 'PHA10007', 'Morning'),
-(8, 'Olivia', 'Wright', 'Female', '555-8888', 'oliviawright@example.com', 'pharma8', 'PHA10008', 'Afternoon'),
-(9, 'Noah', 'King', 'Male', '555-9999', 'noahking@example.com', 'pharma9', 'PHA10009', 'Night'),
-(10, 'Emma', 'Allen', 'Female', '555-0000', 'emmaallen@example.com', 'pharma10', 'PHA10010', 'Morning');
+(1, 'Liam', 'Gray', 'Male', '555-1111', 'liamgray@example.com', 'pharma1', 'PHA10001', 'Morning', 'Available'),
+(2, 'Sophia', 'Clark', 'Female', '555-2222', 'sophiaclark@example.com', 'pharma2', 'PHA10002', 'Afternoon', 'Available'),
+(3, 'Mason', 'Hill', 'Male', '555-3333', 'masonhill@example.com', 'pharma3', 'PHA10003', 'Night', 'Available'),
+(4, 'Ella', 'Scott', 'Female', '555-4444', 'ellascott@example.com', 'pharma4', 'PHA10004', 'Morning', 'Available'),
+(5, 'James', 'Adams', 'Male', '555-5555', 'jamesadams@example.com', 'pharma5', 'PHA10005', 'Afternoon', 'Available'),
+(6, 'Ava', 'Green', 'Female', '555-6666', 'avagreen@example.com', 'pharma6', 'PHA10006', 'Night', 'Available'),
+(7, 'Ethan', 'Baker', 'Male', '555-7777', 'ethanbaker@example.com', 'pharma7', 'PHA10007', 'Morning', 'Available'),
+(8, 'Olivia', 'Wright', 'Female', '555-8888', 'oliviawright@example.com', 'pharma8', 'PHA10008', 'Afternoon', 'Available'),
+(9, 'Noah', 'King', 'Male', '555-9999', 'noahking@example.com', 'pharma9', 'PHA10009', 'Night', 'Available'),
+(10, 'Emma', 'Allen', 'Female', '555-0000', 'emmaallen@example.com', 'pharma10', 'PHA10010', 'Morning', 'Available');
 
 INSERT INTO Medication (name, description, dosage_form, strength, quantity_in_stock, expiration_date, manufacturer)
 VALUES
