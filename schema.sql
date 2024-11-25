@@ -23,8 +23,7 @@ CREATE TABLE Doctor (
     specialization VARCHAR(100),
     license_number VARCHAR(50) UNIQUE,
     status ENUM("Available", "Unavailable"),
-    role varchar(255) GENERATED ALWAYS AS ('Doctor') VIRTUAL,
-    auth varchar(255) GENERATED ALWAYS AS ('User') VIRTUAL
+    user_status varchar(255) GENERATED ALWAYS AS ('User') VIRTUAL
 );
 
 -- Step 2: Create the Subtype Table `Patient`
@@ -40,8 +39,7 @@ CREATE TABLE Patient (
     date_register DATE DEFAULT (CURRENT_DATE),
     address VARCHAR(255),
     emergency_contact VARCHAR(255),
-    role varchar(255) GENERATED ALWAYS AS ('Patient') VIRTUAL,
-    auth varchar(255) GENERATED ALWAYS AS ('User') VIRTUAL
+    user_status varchar(255) GENERATED ALWAYS AS ('User') VIRTUAL
 );
 
 -- Step 3: Create the Subtype Table `Pharmacist`
@@ -57,8 +55,7 @@ CREATE TABLE Pharmacist (
     license_number VARCHAR(50) UNIQUE,
     work_shift ENUM('Morning', 'Afternoon', 'Night'),
     status ENUM("Available", "Unavailable"),
-    role varchar(255) GENERATED ALWAYS AS ('Pharmacist') VIRTUAL,
-    auth varchar(255) GENERATED ALWAYS AS ('User') VIRTUAL
+    user_status varchar(255) GENERATED ALWAYS AS ('User') VIRTUAL
 );
 
 -- Drop tables if they exist to prevent conflicts on re-run
