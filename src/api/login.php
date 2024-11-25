@@ -21,9 +21,13 @@ try{
     // Itterate for each data in array -> auth_data[0] and so on... as a $results vatiable
     foreach($auth_data as $results){
         if($username == $results['email'] && $password == $results['password']){
-            // $_SESSION['role'] = $results['role'];
+            if (session_status() === PHP_SESSION_NONE) {
+                ini_set('session.gc_maxlifetime', 3600); // 1-hour session data lifetime
+                session_start(); // start session
+            }
+            $_SESSION['role'] = $results['role'];
             // echo send json to font , response role because use role to decided which form we gonna go to
-            echo json_encode(["status" => "success", "message" => "User login successfully", "role" => $results['role'], "results" => $results['fname']]);
+            echo json_encode(["status" => "success", "message" => "User login successfully", "role" => $results['role']]);
             break;
         }
     }

@@ -1,5 +1,7 @@
 import { Home, LogIn, UserPlus, Info, LogOut } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { toast } from "sonner"; // Optional for notifications
+import axios from "axios";
 
 const getMenuItems = (isLoggedIn: boolean) => {
   if (isLoggedIn) {
@@ -23,8 +25,18 @@ const Sidebar = () => {
   // Check if user is on a dashboard page
   const isLoggedIn = location.pathname.includes('dashboard');
   
-  const handleLogout = (path: string) => {
+  const handleLogout = async (path: string) => {
     if (path === '/login') {
+    try {
+      const response = await axios.get(
+        "http://localhost:8081/logout.php",
+      );
+      toast.success("Logout successful");
+      console.log(response);
+    } catch (error) {
+      toast.error("Logout error");
+      console.error(error);
+    }
       // Add any logout logic here if needed
       navigate('/login');
     } else {
