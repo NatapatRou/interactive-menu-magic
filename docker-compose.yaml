@@ -29,6 +29,7 @@ services:
       - "9906:3306"
     volumes:
       - ./schema.sql:/docker-entrypoint-initdb.d/schema.sql
+      # - mysql_data:/var/lib/mysql
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
@@ -39,3 +40,6 @@ services:
       PMA_HOST: mysql-db
     depends_on:
       - mysql-db
+
+# volumes:
+#   mysql_data:
