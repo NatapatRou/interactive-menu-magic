@@ -15,6 +15,7 @@ import { toast } from "sonner";
 import Sidebar from "@/components/Sidebar";
 
 interface Symptom {
+  doctor_id: number;
   sym_id: number;
   date_issued: string;
   sym_description: string;
@@ -42,9 +43,9 @@ const PatientSymptoms = () => {
     }
   };
 
-  const handleDelete = async (symptomId: number) => {
+  const handleDelete = async (symptomId: number, doctorId: number) => {
     try {
-      const response = await axios.delete(`http://localhost:8081/delete_symptom.php?id=${symptomId}`, {
+      const response = await axios.delete(`http://localhost:8081/delete_symptom.php?id=${symptomId}&doctor_id=${doctorId}`, {
         withCredentials: true
       });
       
@@ -122,7 +123,7 @@ const PatientSymptoms = () => {
                       <Button
                         variant="destructive"
                         size="icon"
-                        onClick={() => handleDelete(symptom.sym_id)}
+                        onClick={() => handleDelete(symptom.sym_id, symptom.doctor_id)}
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
