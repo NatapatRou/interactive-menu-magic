@@ -12,12 +12,12 @@ try {
     $db = new Connect;
     $patient_id = $_SESSION['id'];
     
-    $query = "SELECT sym_id, date_issued, sym_description FROM Symptom_statement WHERE patient_id = :patient_id";
+    $query = "SELECT doctor_id, sym_id, date_issued, sym_description FROM Symptom_statement WHERE patient_id = :patient_id";
     $stmt = $db->prepare($query);
     $stmt->bindParam(':patient_id', $patient_id);
     $stmt->execute();
     
-    $symptoms = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $symptoms = $stmt->fetchAll(PDO::FETCH_ASSOC); //Convert from PDOStatement Object to multidimentional array
     echo json_encode($symptoms);
 } catch(PDOException $e) {
     http_response_code(500);

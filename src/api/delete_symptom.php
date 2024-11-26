@@ -13,20 +13,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
         $db = new Connect;
         $patient_id = $_SESSION['id'];
         $symptom_id = $_GET['id'];
+        $doctor_id = $_GET['doctor_id'];
         
-        $query = "DELETE FROM Symptom_statement WHERE sym_id = :sym_id AND patient_id = :patient_id";
-        $stmt = $db->prepare($query);
-        $stmt->bindParam(':sym_id', $symptom_id);
-        $stmt->bindParam(':patient_id', $patient_id);
+        $delete_query = "DELETE FROM Symptom_statement WHERE sym_id = :sym_id AND patient_id = :patient_id";
+        $delete_stmt = $db->prepare($delete_query);
+        $delete_stmt->bindParam(':sym_id', $symptom_id);
+        $delete_stmt->bindParam(':patient_id', $patient_id);
         
-        if ($stmt->execute()) {
+        $update_query = "UPDATE Doctor SET status = 'Available' WHERE id = :doctor_id";
+        $update_stmt = $db->prepare($update_query);
+        $update_stmt->bindParam(':doctor_id', $doctor_id);
+
+        if ($delete_stmt->execute() && $update_stmt->execute()) {
             echo json_encode(["status" => "success", "message" => "Symptom deleted successfully"]);
         } else {
             throw new Exception("Failed to delete symptom");
         }
+        
     } catch(Exception $e) {
         http_response_code(500);
         echo json_encode(["error" => $e->getMessage()]);
     }
+    // Should change doctor from unavailable back to available -> how to get doctor id by GET?
 }
 ?>
