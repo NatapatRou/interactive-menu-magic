@@ -206,6 +206,10 @@ VALUES
 (10, 10);
 
 
+CREATE USER 'admin'@'%' IDENTIFIED BY 'admin';
+GRANT SELECT, INSERT, DELETE ON drug_dispense.Doctor TO 'admin'@'%';
+GRANT SELECT, INSERT, DELETE ON drug_dispense.Patient TO 'admin'@'%';
+GRANT SELECT, INSERT, DELETE ON drug_dispense.Pharmacist TO 'admin'@'%';
 
 
 
