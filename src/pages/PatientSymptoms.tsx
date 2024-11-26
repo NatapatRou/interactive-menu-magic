@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { Trash2 } from "lucide-react";
+import { Trash2, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -60,6 +60,10 @@ const PatientSymptoms = () => {
     }
   };
 
+  const handleBack = () => {
+    navigate('/patient-dashboard');
+  };
+
   if (symptoms.length === 0) {
     return (
       <div className="min-h-screen bg-gray-50">
@@ -67,6 +71,15 @@ const PatientSymptoms = () => {
         <div className="pl-64">
           <div className="container mx-auto px-4 py-8">
             <h1 className="text-2xl font-bold mb-6">My Symptoms Request</h1>
+            <Button 
+              variant="outline" 
+              onClick={handleBack}
+              className="mb-4"
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Create Symptom
+            </Button>
+            <h1 className="text-2xl font-bold mb-6">My Symptoms History</h1>
             <div className="bg-white rounded-lg shadow p-6 text-center text-gray-500">
               No symptoms recorded yet.
             </div>
@@ -82,6 +95,15 @@ const PatientSymptoms = () => {
       <div className="pl-64">
         <div className="container mx-auto px-4 py-8">
           <h1 className="text-2xl font-bold mb-6">My Symptoms Request</h1>
+          <Button 
+            variant="outline" 
+            onClick={handleBack}
+            className="mb-4"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Create Symptom
+          </Button>
+          <h1 className="text-2xl font-bold mb-6">My Symptoms History</h1>
           <div className="bg-white rounded-lg shadow overflow-hidden">
             <Table>
               <TableHeader>
