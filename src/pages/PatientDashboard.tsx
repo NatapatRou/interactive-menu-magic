@@ -48,7 +48,7 @@ const PatientDashboard = () => {
 
       if (response.data.status === "success") {
         toast.success("Sended Symptoms");
-        navigate("/"); // Redirect to patient page
+        navigate("/patient-symptoms"); // Redirect to patient page
       } else {
         toast.error(response.data.message || "Sended Symptoms failed");
       }
