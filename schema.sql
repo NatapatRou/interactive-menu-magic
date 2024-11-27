@@ -84,13 +84,14 @@ CREATE TABLE Prescription (
     doctor_id INT NOT NULL,             -- References doctor 
     patient_id INT NOT NULL,            -- References patient 
     pharmacist_id INT NOT NULL,			-- References phramacist 
+    medication_id INT NOT NULL,         -- References medication
     date_issued DATE DEFAULT (CURRENT_DATE),
     status ENUM('Pending', 'Confirmed', 'Dispensed') DEFAULT 'Pending',
     notes TEXT,
-    dosage_instructions TEXT,
     CONSTRAINT fk_PresDoc FOREIGN KEY (doctor_id) REFERENCES Doctor(id) ON DELETE CASCADE,
     CONSTRAINT fk_PresPatient FOREIGN KEY (patient_id) REFERENCES Patient(id) ON DELETE CASCADE,
-    CONSTRAINT fk_PresParma FOREIGN KEY (pharmacist_id) REFERENCES Pharmacist(id) ON DELETE CASCADE
+    CONSTRAINT fk_PresParma FOREIGN KEY (pharmacist_id) REFERENCES Pharmacist(id) ON DELETE CASCADE,
+    CONSTRAINT fk_PresMed FOREIGN KEY (medication_id) REFERENCES Medication(medication_id) ON DELETE CASCADE
 );
 
 -- Create Symptom_statement Table
@@ -205,18 +206,18 @@ VALUES
 ('Azithromycin', 'Antibiotic for infections', 'Tablet', '250mg', 120, '2025-08-08', 'PharmaPlus'),
 ('Aspirin', 'Pain relief and blood thinner', 'Tablet', '81mg', 500, '2025-09-18', 'HealthFirst');
 
-INSERT INTO Prescription (doctor_id, patient_id, pharmacist_id, date_issued, status, notes, dosage_instructions)
-VALUES
-(1, 1, 1, '2024-11-20', 'Pending', 'Pain management', 'Take 1 tablet every 8 hours'),
-(2, 2, 2, '2024-11-19', 'Confirmed', 'Antibiotic course', 'Take 2 capsules daily for 7 days'),
-(3, 3, 3, '2024-11-18', 'Dispensed', 'Fever reduction', 'Take 1 tablet twice a day'),
-(4, 4, 4, '2024-11-17', 'Pending', 'Allergy relief', 'Take 1 tablet at bedtime'),
-(5, 5, 5, '2024-11-16', 'Dispensed', 'Diabetes management', 'Take 1 tablet with breakfast'),
-(6, 6, 6, '2024-11-15', 'Confirmed', 'Acid reflux treatment', 'Take 1 capsule 30 minutes before meals'),
-(7, 7, 7, '2024-11-14', 'Pending', 'Cholesterol control', 'Take 1 tablet at night'),
-(8, 8, 8, '2024-11-13', 'Dispensed', 'Infection control', 'Take 1 tablet daily for 5 days'),
-(9, 9, 9, '2024-11-12', 'Confirmed', 'Pain relief', 'Take 1 tablet as needed, up to 3 times a day'),
-(10, 10, 10, '2024-11-11', 'Pending', 'General health', 'Take 1 tablet every morning');
+-- INSERT INTO Prescription (doctor_id, patient_id, pharmacist_id, date_issued, status, notes, dosage_instructions)
+-- VALUES
+-- (1, 1, 1, '2024-11-20', 'Pending', 'Pain management', 'Take 1 tablet every 8 hours'),
+-- (2, 2, 2, '2024-11-19', 'Confirmed', 'Antibiotic course', 'Take 2 capsules daily for 7 days'),
+-- (3, 3, 3, '2024-11-18', 'Dispensed', 'Fever reduction', 'Take 1 tablet twice a day'),
+-- (4, 4, 4, '2024-11-17', 'Pending', 'Allergy relief', 'Take 1 tablet at bedtime'),
+-- (5, 5, 5, '2024-11-16', 'Dispensed', 'Diabetes management', 'Take 1 tablet with breakfast'),
+-- (6, 6, 6, '2024-11-15', 'Confirmed', 'Acid reflux treatment', 'Take 1 capsule 30 minutes before meals'),
+-- (7, 7, 7, '2024-11-14', 'Pending', 'Cholesterol control', 'Take 1 tablet at night'),
+-- (8, 8, 8, '2024-11-13', 'Dispensed', 'Infection control', 'Take 1 tablet daily for 5 days'),
+-- (9, 9, 9, '2024-11-12', 'Confirmed', 'Pain relief', 'Take 1 tablet as needed, up to 3 times a day'),
+-- (10, 10, 10, '2024-11-11', 'Pending', 'General health', 'Take 1 tablet every morning');
 
 -- INSERT INTO Symptom_statament (patient_id, date_issued, sym_description)
 -- VALUES

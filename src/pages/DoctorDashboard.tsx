@@ -1,4 +1,6 @@
 import { Button } from "@/components/ui/button";
+import { useState, useEffect } from "react";
+import axios from "axios";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Form,
@@ -21,29 +23,41 @@ import * as z from "zod";
 import Sidebar from "@/components/Sidebar";
 import { toast } from "sonner";
 
+interface Patients {
+  patient_id: number;
+  fname: string;
+  lname: string;
+  sym_description: string;
+}
+interface Medication {
+  medication_id: number;
+  name: string;
+  description: string;
+}
+
 // Mock data for medicines
-const medicines = [
-  {
-    id: "1",
-    name: "Amoxicillin",
-    description: "Antibiotic used to treat bacterial infections",
-  },
-  {
-    id: "2",
-    name: "Ibuprofen",
-    description: "Pain reliever and fever reducer",
-  },
-  {
-    id: "3",
-    name: "Omeprazole",
-    description: "Reduces stomach acid production",
-  },
-  {
-    id: "4",
-    name: "Loratadine",
-    description: "Antihistamine for allergy relief",
-  },
-];
+//const medicines = [
+  // {
+  //   id: "1",
+  //   name: "Amoxicillin",
+  //   description: "Antibiotic used to treat bacterial infections",
+  // },
+  // {
+  //   id: "2",
+  //   name: "Ibuprofen",
+  //   description: "Pain reliever and fever reducer",
+  // },
+  // {
+  //   id: "3",
+  //   name: "Omeprazole",
+  //   description: "Reduces stomach acid production",
+ // },
+  //{
+   // id: "4",
+   // name: "Loratadine",
+   // description: "Antihistamine for allergy relief",
+  //},
+//];
 
 const prescriptionSchema = z.object({
   patientId: z.string().min(1, "Please select a patient"),
@@ -52,6 +66,47 @@ const prescriptionSchema = z.object({
 });
 
 const DoctorDashboard = () => {
+  const [medication, setMedication] = useState<Medication[]>([]);
+  
+
+  useEffect(() => {
+    fetchMedication();
+  }, []);
+
+  const fetchMedication = async () => {
+    try {
+      const response = await axios.get("http://localhost:8081/select_medicine.php", {
+        withCredentials: true
+      });
+      if (response.data) {
+        setMedication(response.data);
+      }
+    } catch (error) {
+      toast.error("Failed to select medication");
+      console.error(error);
+    }
+  };
+  //=============================
+  const [patients, setPatients] = useState<Patients[]>([]);
+  
+
+  useEffect(() => {
+    fetchPatients();
+  }, []);
+
+  const fetchPatients = async () => {
+    try {
+      const response = await axios.get("http://localhost:8081/select_patient.php", {
+        withCredentials: true
+      });
+      if (response.data) {
+        setPatients(response.data);
+      }
+    } catch (error) {
+      toast.error("Failed to select patient");
+      console.error(error);
+    }
+  };
   const form = useForm<z.infer<typeof prescriptionSchema>>({
     resolver: zodResolver(prescriptionSchema),
     defaultValues: {
@@ -61,19 +116,42 @@ const DoctorDashboard = () => {
     },
   });
 
-  const onSubmit = (values: z.infer<typeof prescriptionSchema>) => {
-    console.log(values);
-    toast.success("Prescription created successfully");
+  const onSubmit = async (values: z.infer<typeof prescriptionSchema>) => {
+    try {
+      const response = await axios.post(
+        `http://localhost:8081/create_prescription.php`,
+        values,
+        {
+          headers: {
+            "Content-Type": "application/json", // Specify JSON format
+          }, withCredentials: true,
+        },
+      );
+      console.log(response);
+
+      if (response.data.status === "success") {
+        toast.success("Create prescription success");
+      } else {
+        toast.error(response.data.message || "Create prescription failed");
+      }
+    } catch (error) {
+      toast.error("An error occurred during Create prescription");
+      console.error(error);
+    }
   };
 
   // Mock patient data - replace with actual API call
-  const patients = [
-    { id: "1", name: "John Doe", symptoms: "Fever and headache" },
-    { id: "2", name: "Jane Smith", symptoms: "Cough and sore throat" },
-  ];
+  //const patients = [
+    //{ id: "1", name: "John Doe", symptoms: "Fever and headache" },
+    //{ id: "2", name: "Jane Smith", symptoms: "Cough and sore throat" },
+  //];
 
-  const selectedMedicine = medicines.find(
-    (med) => med.id === form.watch("medicineId"),
+  const selectedPatient = patients.find(
+    (patient) => patient.patient_id === Number(form.watch("patientId"))
+  );
+
+  const selectedMedicine = medication.find(
+    (medication) => medication.medication_id === Number(form.watch("medicineId"))
   );
 
   return (
@@ -83,20 +161,21 @@ const DoctorDashboard = () => {
         <div className="container mx-auto px-4 py-8">
           <h1 className="text-2xl font-bold mb-6">Doctor Dashboard</h1>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-            {patients.map((patient) => (
-              <Card key={patient.id}>
-                <CardHeader>
-                  <CardTitle>Patient: {patient.name}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-600">{patient.symptoms}</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+          {/* Render details of selected patient */}
+          {selectedPatient ? (
+            <Card>
+              <CardHeader>
+                <CardTitle>Patient: {selectedPatient.fname} {selectedPatient.lname}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-600">{selectedPatient.sym_description}</p>
+              </CardContent>
+            </Card>
+          ) : (
+            <p className="text-gray-600 mb-6">Select a patient to view details.</p>
+          )}
 
-          <Card>
+          <Card className="mt-6">
             <CardHeader>
               <CardTitle>Create Prescription</CardTitle>
             </CardHeader>
@@ -123,8 +202,8 @@ const DoctorDashboard = () => {
                           </FormControl>
                           <SelectContent>
                             {patients.map((patient) => (
-                              <SelectItem key={patient.id} value={patient.id}>
-                                {patient.name}
+                              <SelectItem key={patient.patient_id} value={patient.patient_id.toString()}>
+                                {patient.fname} {patient.lname}
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -148,9 +227,9 @@ const DoctorDashboard = () => {
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {medicines.map((medicine) => (
-                              <SelectItem key={medicine.id} value={medicine.id}>
-                                {medicine.name}
+                            {medication.map((medication) => (
+                              <SelectItem key={medication.medication_id} value={medication.medication_id.toString()}>
+                                {medication.name}
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -189,5 +268,6 @@ const DoctorDashboard = () => {
     </div>
   );
 };
+
 
 export default DoctorDashboard;

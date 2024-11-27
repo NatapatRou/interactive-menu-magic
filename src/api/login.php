@@ -53,12 +53,12 @@ try{
             $stmt->bindParam(':patient_id', $_SESSION['id']);
             break;
         case "Doctor":
-            $get_pass = "SELECT AES_DECRYPT( password, SHA1(:key) AS password FROM Doctor WHERE id = :doctor_id";
+            $get_pass = "SELECT AES_DECRYPT( password, SHA1(:key)) AS password FROM Doctor WHERE id = :doctor_id";
             $stmt = $conn->prepare($get_pass);
             $stmt->bindParam(':doctor_id', $_SESSION['id']);
             break;
         case "Pharmacist":
-            $get_pass = "SELECT AES_DECRYPT( password, SHA1(:key) AS password FROM Pharmacist WHERE id = :pharmacist_id";
+            $get_pass = "SELECT AES_DECRYPT( password, SHA1(:key)) AS password FROM Pharmacist WHERE id = :pharmacist_id";
             $stmt = $conn->prepare($get_pass);
             $stmt->bindParam(':pharmacist_id', $_SESSION['id']);
             break;
