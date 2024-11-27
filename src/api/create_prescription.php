@@ -15,21 +15,15 @@ $data = json_decode(file_get_contents("php://input"), true);
 $avaiable_crew = $API->select_first_available();
 $pharmacist_id = $avaiable_crew[1]['id']; 
 
+$sql_sym = "INSERT INTO Prescription ( doctor_id, patient_id, pharmacist_id, medication_id, date_issued, status, notes )
+    VALUES (:doctor_id,:patient_id,:pharmacist_id,:medication_id,CURDATE(),'Pending',:notes)";
+$sym_stmt = $conn->prepare($sql_sym);
 
+$sym_stmt->bindParam(':doctor_id', $_SESSION['id']);
+$sym_stmt->bindParam(':patient_id', $data['patientId']);
+$sym_stmt->bindParam(':pharmacist_id', $pharmacist_id);
+$sym_stmt->bindParam(':medication_id', $data['medicineId']);
+$sym_stmt->bindParam(':notes', $data['prescription']);
 
-    $sql_sym = "INSERT INTO Prescription (doctor_id, patient_id, pharmacist_id, medication_id, date_issued, status, notes)
-    VALUES
-    (:doctor_id, :patient_id, :pharmacist_id, :medication_id, CURDATE(), 'Pending', :notes)";
-
-    $sym_stmt = $conn->prepare($sql_sym);
-
- 
-    $sym_stmt->bindParam(':doctor_id', $_SESSION['id']);
-    $sym_stmt->bindParam(':patient_id', $data['patientId']);
-    $sym_stmt->bindParam(':pharmacist_id', $pharmacist_id);
-    $sym_stmt->bindParam(':patient_id', $data['medicineId']);
-    $sym_stmt->bindParam(':notes', $data['prescription']);
-    
-
-    $sym_stmt->execute();
-    echo json_encode(["status" => "success", "message" => "Create Prescription successfully"]);
+$sym_stmt->execute();
+echo json_encode(["status" => "success", "message" => "Create Prescription successfully"]);
