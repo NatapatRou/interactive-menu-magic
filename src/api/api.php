@@ -79,7 +79,7 @@
                     'fname' => $results['fname'],
                     'lname' => $results['lname'],
                     'email' => $results['email'],
-                    'password' => $results['password'],
+                    // 'password' => $results['password'],
                 );
             }
             return $users;
@@ -93,7 +93,7 @@
     SELECT id, fname, lname, status FROM Pharmacist WHERE status = 'Available'");
             $data->execute();
         // The fetch() method is called on a PDO statement object (e.g., $data in your example) after executing a query. It retrieves the next row from the result set.
-            while($results = $data->fetch(PDO::FETCH_ASSOC)){
+            while($results = $data->fetch(PDO::FETCH_ASSOC)){ // use fetch with while because we want to select a column individually
                 # use like dict -> "id": f"{result['id]}" | key:value
                 $users[] = array(
                     'id' => $results['id'],
