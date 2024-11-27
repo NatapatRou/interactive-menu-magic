@@ -15,11 +15,11 @@ $API = require_once __DIR__ . "/api.php";
 
 $conn = new Connect();
 $data = json_decode(file_get_contents("php://input"), true);
-
 try {
     $available_crew = $API->select_first_available();
     $pharmacist_id = $available_crew[1]['id'];
-
+    $sym_id = $_GET["sym_id"];
+    
     $sql = "INSERT INTO Prescription 
                 (doctor_id, patient_id, pharmacist_id, medication_id, date_issued, status, notes)
             VALUES 
@@ -38,7 +38,11 @@ try {
     $update_stmt = $conn->prepare($update_sql);
     $update_stmt->bindParam(':pharmacist_id', $pharmacist_id);
     $update_stmt->execute();
-    
+
+    $update_sym = "UPDATE Symptom_statement SET status = 'Confirmed' WHERE sym_id = :sym_id";
+    $update_sym_stmt = $conn->prepare($update_sym);
+    $update_sym_stmt->bindParam(':sym_id', $sym_id);
+    $update_sym_stmt->execute();
     
     echo json_encode(["status" => "success", "message" => "Prescription created successfully"]);
 } catch (Exception $e) {

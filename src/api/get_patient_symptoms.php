@@ -12,7 +12,7 @@ try {
     $db = new Connect;
     $patient_id = $_SESSION['id'];
     
-    $query = "SELECT doctor_id, sym_id, date_issued, sym_description FROM Symptom_statement WHERE patient_id = :patient_id";
+    $query = "SELECT doctor_id, sym_id, date_issued, sym_description FROM Symptom_statement WHERE patient_id = :patient_id AND status = 'Pending'";
     $stmt = $db->prepare($query);
     $stmt->bindParam(':patient_id', $patient_id);
     $stmt->execute();

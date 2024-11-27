@@ -11,7 +11,8 @@ require_once __DIR__ . '/config.php';
 $db = new Connect;
 $doctor_id = $_SESSION['id'];
 
-$query = "SELECT patient_id, p.fname, p.lname, sy.sym_description FROM Patient p JOIN Symptom_statement sy ON p.id = sy.patient_id WHERE doctor_id = :doctor_id";
+// select symptom
+$query = "SELECT patient_id, p.fname, p.lname, sy.sym_description, sy.sym_id FROM Patient p JOIN Symptom_statement sy ON p.id = sy.patient_id WHERE doctor_id = :doctor_id AND sy.status = 'Pending'";
 $stmt = $db->prepare($query);
 $stmt->bindParam(':doctor_id', $doctor_id);
 $stmt->execute();
