@@ -100,6 +100,7 @@ CREATE TABLE Symptom_statement(
     patient_id INT NOT NULL,
     doctor_id INT NOT NULL,
     date_issued DATE DEFAULT (CURRENT_DATE),
+    status ENUM('Pending', 'Confirmed') DEFAULT 'Pending',
 	sym_description TEXT,
     CONSTRAINT fk_PatientSym FOREIGN KEY (patient_id) REFERENCES Patient(id) ON DELETE CASCADE,
     CONSTRAINT fk_DoctorSym FOREIGN KEY (doctor_id) REFERENCES Doctor(id) ON DELETE CASCADE
