@@ -34,8 +34,8 @@ try {
     $insert_stmt->bindParam(':notes', $data['prescription']);
     $insert_stmt->execute();
     
-    $update_sql = "UPDATE Pharmacist SET status = 'Unavailable' WHERE id = :pharmacist_id ";
-    $update_stmt = $conn->prepare($update_sql);
+    $update_phar = "UPDATE Pharmacist SET status = 'Unavailable' WHERE id = :pharmacist_id ";
+    $update_stmt = $conn->prepare($update_phar);
     $update_stmt->bindParam(':pharmacist_id', $pharmacist_id);
     $update_stmt->execute();
 
@@ -43,6 +43,11 @@ try {
     $update_sym_stmt = $conn->prepare($update_sym);
     $update_sym_stmt->bindParam(':sym_id', $sym_id);
     $update_sym_stmt->execute();
+
+    $update_doc = "UPDATE Doctor SET status = 'Available' WHERE id = :doctor_id ";
+    $update_doc_stmt = $conn->prepare($update_doc);
+    $update_doc_stmt->bindParam(':doctor_id', $_SESSION['id']);
+    $update_doc_stmt->execute();
     
     echo json_encode(["status" => "success", "message" => "Prescription created successfully"]);
 } catch (Exception $e) {
