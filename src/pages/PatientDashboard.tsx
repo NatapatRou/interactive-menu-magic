@@ -31,6 +31,10 @@ const PatientDashboard = () => {
     },
   });
 
+  const handleBack = () => {
+    navigate('/patient-symptoms');
+  };
+
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     console.log(values);
     try {
@@ -64,6 +68,13 @@ const PatientDashboard = () => {
       <Sidebar />
       <div className="pl-64">
         <div className="container mx-auto px-4 py-8">
+          <Button 
+            variant="outline" 
+            onClick={handleBack}
+            className="mb-4"
+          >
+            All Symptom
+          </Button>
           <h1 className="text-2xl font-bold mb-6">Submit Symptoms</h1>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">

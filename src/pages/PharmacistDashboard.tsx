@@ -19,12 +19,46 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import Sidebar from "@/components/Sidebar";
 import { toast } from "sonner";
+import { useState, useEffect } from "react";
+import axios from "axios";
 
 const dispenseSchema = z.object({
   prescriptionId: z.string().min(1, "Please select a prescription"),
 });
 
+interface Prescription {
+    prescription_id: number,    
+    patient_id: number,
+    doctor_id: number,    
+    patient_name: string,
+    med_name: string,
+    description: string,
+    pharmacist_id: number,    
+    medication_id: number,    
+    notes: string    
+}
 const PharmacistDashboard = () => {
+  const [prescription, setPrescription] = useState<Prescription[]>([]);
+  
+
+  useEffect(() => {
+    fetchPrescription();
+  }, []); //call once when client rendered
+
+  const fetchPrescription = async () => {
+    try {
+      const response = await axios.get("http://localhost:8081/get_prescription.php", {
+        withCredentials: true
+      });
+      if (response.data) {
+        setPrescription(response.data);
+      }
+      console.log(response.data);
+    } catch (error) {
+      toast.error("Failed to get prescription");
+      console.error(error);
+    }
+  };
   const form = useForm<z.infer<typeof dispenseSchema>>({
     resolver: zodResolver(dispenseSchema),
     defaultValues: {
@@ -32,40 +66,71 @@ const PharmacistDashboard = () => {
     },
   });
 
-  const onSubmit = (values: z.infer<typeof dispenseSchema>) => {
-    console.log(values);
-    toast.success("Medication dispensed successfully");
+  const onSubmit = async (values: z.infer<typeof dispenseSchema>) => {
+    try {
+      const response = await axios.post(
+        `http://localhost:8081/disperse_med.php?med_id=${selectedPrescription.medication_id}`,
+        values,
+        {
+          headers: {
+            "Content-Type": "application/json", // Specify JSON format
+          }, 
+          withCredentials: true,
+        },
+      );
+      console.log(response);
+
+      if (response.data.status === "success") {
+        toast.success("Dispensing prescription success");
+        window.location.reload();
+      } else {
+        toast.error(response.data.message || "Dispensing prescription failed");
+      }
+    } catch (error) {
+      toast.error("An error occurred during dispnesing prescription");
+      console.error(error);
+    }
   };
 
+  const selectedPrescription = prescription.find(
+    (prescription) => prescription.prescription_id === Number(form.watch("prescriptionId"))
+  );
   // Mock prescription data - replace with actual API call
-  const prescriptions = [
-    { id: "1", patientName: "John Doe", medication: "Amoxicillin 500mg" },
-    { id: "2", patientName: "Jane Smith", medication: "Ibuprofen 400mg" },
-    { id: "3", patientName: "uwu Smith", medication: "Ibuprofen 400mg" },
-  ];
+  // const prescriptions = [
+  //   { id: "1", patientName: "John Doe", medication: "Amoxicillin 500mg" },
+  //   { id: "2", patientName: "Jane Smith", medication: "Ibuprofen 400mg" },
+  //   { id: "3", patientName: "uwu Smith", medication: "Ibuprofen 400mg" },
+  // ];
 
-  return (
+return (
     <div className="min-h-screen bg-gray-50">
       <Sidebar />
       <div className="pl-64">
         <div className="container mx-auto px-4 py-8">
           <h1 className="text-2xl font-bold mb-6">Pharmacist Dashboard</h1>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-            {prescriptions.map((prescription) => (
-              <Card key={prescription.id}>
+          {/* Show card only if a prescription is selected */}
+          {selectedPrescription ? (
+            <div className="mb-8">
+              <Card>
                 <CardHeader>
-                  <CardTitle>Patient: {prescription.patientName}</CardTitle>
+                  <CardTitle>Patient: {selectedPrescription.patient_name}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-gray-600">
-                    Medication: {prescription.medication}
+                    Medication: {selectedPrescription.med_name}
+                  </p>
+                  <p className="text-gray-600 mt-2">
+                    Notes: {selectedPrescription.notes}
                   </p>
                 </CardContent>
               </Card>
-            ))}
-          </div>
+            </div>
+          ) : (
+            <p className="text-gray-600 mb-6">Select a prescription to view details.</p>
+          )}
 
+          {/* Form to select and dispense medication */}
           <Card>
             <CardHeader>
               <CardTitle>Dispense Medication</CardTitle>
@@ -92,13 +157,13 @@ const PharmacistDashboard = () => {
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {prescriptions.map((prescription) => (
+                            {prescription.map((prescription) => (
                               <SelectItem
-                                key={prescription.id}
-                                value={prescription.id}
+                                key={prescription.prescription_id}
+                                value={prescription.prescription_id.toString()}
                               >
-                                {prescription.patientName} -{" "}
-                                {prescription.medication}
+                                {prescription.patient_name} -{" "}
+                                {prescription.med_name}
                               </SelectItem>
                             ))}
                           </SelectContent>

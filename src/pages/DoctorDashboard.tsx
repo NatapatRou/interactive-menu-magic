@@ -28,6 +28,7 @@ interface Patients {
   fname: string;
   lname: string;
   sym_description: string;
+  sym_id: number;
 }
 interface Medication {
   medication_id: number;
@@ -96,7 +97,7 @@ const DoctorDashboard = () => {
 
   const fetchPatients = async () => {
     try {
-      const response = await axios.get("http://localhost:8081/select_patient.php", {
+      const response = await axios.get(`http://localhost:8081/select_patient.php`, {
         withCredentials: true
       });
       if (response.data) {
@@ -119,7 +120,7 @@ const DoctorDashboard = () => {
   const onSubmit = async (values: z.infer<typeof prescriptionSchema>) => {
     try {
       const response = await axios.post(
-        `http://localhost:8081/create_prescription.php`,
+        `http://localhost:8081/create_prescription.php?sym_id=${selectedPatient.sym_id}`,
         values,
         {
           headers: {
@@ -131,6 +132,7 @@ const DoctorDashboard = () => {
 
       if (response.data.status === "success") {
         toast.success("Create prescription success");
+        window.location.reload();
       } else {
         toast.error(response.data.message || "Create prescription failed");
       }
