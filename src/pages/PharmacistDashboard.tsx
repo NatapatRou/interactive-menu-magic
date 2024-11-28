@@ -26,40 +26,82 @@ const dispenseSchema = z.object({
   prescriptionId: z.string().min(1, "Please select a prescription"),
 });
 
-interface Prescription {
-    prescription_id: number,    
-    patient_id: number,
-    doctor_id: number,    
-    patient_name: string,
-    med_name: string,
-    description: string,
-    pharmacist_id: number,    
-    medication_id: number,    
-    notes: string    
+interface RawPrescriptionData {
+  prescription_id: number;
+  patient_id: number;
+  doctor_id: number;
+  patient_name: string;
+  pharmacist_id: number;
+  notes: string;
+  medication_id: number;
+  med_name: string;
+  description: string;
 }
+interface Prescription {
+  prescription_id: number;
+  patient_id: number;
+  doctor_id: number;
+  patient_name: string;
+  pharmacist_id: number;
+  notes: string;
+  medications: MedDetail[];
+}
+
+interface MedDetail {
+  med_id: number;
+  med_name: string;
+  description: string;
+}
+
 const PharmacistDashboard = () => {
-  const [prescription, setPrescription] = useState<Prescription[]>([]);
-  
+  const [combinedData, setCombinedData] = useState<Prescription[]>([]);
 
   useEffect(() => {
-    fetchPrescription();
-  }, []); //call once when client rendered
+    const fetchPrescriptionData = async () => {
+      try {
+        const response = await axios.get("http://localhost:8081/get_prescription.php", {
+          withCredentials: true,
+        });
 
-  const fetchPrescription = async () => {
-    try {
-      const response = await axios.get("http://localhost:8081/get_prescription.php", {
-        withCredentials: true
-      });
-      if (response.data) {
-        setPrescription(response.data);
-        console.log(response.data);
+        if (response.data) {
+          const transformedData = transformPrescriptionData(response.data);
+          setCombinedData(transformedData); // Correctly typed data
+        }
+      } catch (error) {
+        toast.error("Failed to fetch prescription data");
+        console.error(error);
       }
-      console.log(response.data);
-    } catch (error) {
-      toast.error("Failed to get prescription");
-      console.error(error);
-    }
+    };
+
+    fetchPrescriptionData();
+  }, []);
+
+  const transformPrescriptionData = (
+    rawData: RawPrescriptionData[]
+  ): Prescription[] => {
+    const groupedData = rawData.reduce((acc, item) => {
+      const { prescription_id, med_name, medication_id, description, ...rest } = item;
+
+      if (!acc[prescription_id]) {
+        acc[prescription_id] = {
+          ...rest,
+          prescription_id,
+          medications: [],
+        };
+      }
+
+      acc[prescription_id].medications.push({
+        med_id: medication_id,
+        med_name,
+        description,
+      });
+
+      return acc;
+    }, {} as Record<number, Prescription>);
+
+    return Object.values(groupedData);
   };
+
   const form = useForm<z.infer<typeof dispenseSchema>>({
     resolver: zodResolver(dispenseSchema),
     defaultValues: {
@@ -70,40 +112,34 @@ const PharmacistDashboard = () => {
   const onSubmit = async (values: z.infer<typeof dispenseSchema>) => {
     try {
       const response = await axios.post(
-        `http://localhost:8081/disperse_med.php?med_id=${selectedPrescription.medication_id}`,
+        `http://localhost:8081/disperse_med.php`,
         values,
         {
           headers: {
-            "Content-Type": "application/json", // Specify JSON format
-          }, 
+            "Content-Type": "application/json",
+          },
           withCredentials: true,
-        },
+        }
       );
-      console.log(response);
-
+        console.log("Current Form Values:", values); 
       if (response.data.status === "success") {
-        toast.success("Dispensing prescription success");
-        window.location.reload();
+        toast.success("Dispensing prescription successful");
+        // window.location.reload();
       } else {
+        console.log(response.data);
         toast.error(response.data.message || "Dispensing prescription failed");
       }
     } catch (error) {
-      toast.error("An error occurred during dispnesing prescription");
+      toast.error("An error occurred during dispensing prescription");
       console.error(error);
     }
   };
 
-  const selectedPrescription = prescription.find(
+  const selectedPrescription = combinedData.find(
     (prescription) => prescription.prescription_id === Number(form.watch("prescriptionId"))
   );
-  // Mock prescription data - replace with actual API call
-  // const prescriptions = [
-  //   { id: "1", patientName: "John Doe", medication: "Amoxicillin 500mg" },
-  //   { id: "2", patientName: "Jane Smith", medication: "Ibuprofen 400mg" },
-  //   { id: "3", patientName: "uwu Smith", medication: "Ibuprofen 400mg" },
-  // ];
 
-return (
+  return (
     <div className="min-h-screen bg-gray-50">
       <Sidebar />
       <div className="pl-64">
@@ -118,12 +154,15 @@ return (
                   <CardTitle>Patient: {selectedPrescription.patient_name}</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-gray-600">
-                    Medication: {selectedPrescription.med_name}
-                  </p>
-                  <p className="text-gray-600 mt-2">
-                    Notes: {selectedPrescription.notes}
-                  </p>
+                  <p className="text-gray-600 mt-2">Notes: {selectedPrescription.notes}</p>
+                  <p className="text-gray-600 mt-4 font-semibold">Medications:</p>
+                  <ul className="list-disc pl-5">
+                    {selectedPrescription.medications.map((med) => (
+                      <li key={med.med_id} className="text-gray-600">
+                        {med.med_name} - {med.description}
+                      </li>
+                    ))}
+                  </ul>
                 </CardContent>
               </Card>
             </div>
@@ -158,13 +197,12 @@ return (
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {prescription.map((prescription) => (
+                            {combinedData.map((prescription) => (
                               <SelectItem
                                 key={prescription.prescription_id}
                                 value={prescription.prescription_id.toString()}
                               >
-                                {prescription.patient_name} -{" "}
-                                {prescription.med_name}
+                                {prescription.patient_name} - Notes: {prescription.notes}
                               </SelectItem>
                             ))}
                           </SelectContent>
