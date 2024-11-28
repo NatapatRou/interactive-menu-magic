@@ -107,7 +107,7 @@ CREATE TABLE Symptom_statement(
 );
 
 -- Create  Table Medication_detail
-CREATE TABLE Medication_datail(
+CREATE TABLE Medication_detail(
 	med_detail_id INT PRIMARY KEY auto_increment,
     prescription_id INT,
     medication_id INT,
