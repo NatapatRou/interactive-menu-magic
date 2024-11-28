@@ -36,125 +36,102 @@ interface Medication {
   description: string;
 }
 
-// Mock data for medicines
-//const medicines = [
-  // {
-  //   id: "1",
-  //   name: "Amoxicillin",
-  //   description: "Antibiotic used to treat bacterial infections",
-  // },
-  // {
-  //   id: "2",
-  //   name: "Ibuprofen",
-  //   description: "Pain reliever and fever reducer",
-  // },
-  // {
-  //   id: "3",
-  //   name: "Omeprazole",
-  //   description: "Reduces stomach acid production",
- // },
-  //{
-   // id: "4",
-   // name: "Loratadine",
-   // description: "Antihistamine for allergy relief",
-  //},
-//];
-
 const prescriptionSchema = z.object({
   patientId: z.string().min(1, "Please select a patient"),
-  medicineId: z.string().min(1, "Please select a medicine"),
+  medicineIds: z.array(z.string()).min(1, "Please select at least one medicine"),
   prescription: z.string().min(10, "Prescription details required"),
 });
 
 const DoctorDashboard = () => {
   const [medication, setMedication] = useState<Medication[]>([]);
-  
+  const [patients, setPatients] = useState<Patients[]>([]);
+  const [selectedMedicines, setSelectedMedicines] = useState<Medication[]>([]);
 
+  // Fetch medications
   useEffect(() => {
+    const fetchMedication = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:8081/select_medicine.php",
+          { withCredentials: true }
+        );
+        if (response.data) {
+          setMedication(response.data);
+        }
+      } catch (error) {
+        toast.error("Failed to fetch medications");
+        console.error(error);
+      }
+    };
+
     fetchMedication();
   }, []);
 
-  const fetchMedication = async () => {
-    try {
-      const response = await axios.get("http://localhost:8081/select_medicine.php", {
-        withCredentials: true
-      });
-      if (response.data) {
-        setMedication(response.data);
-      }
-    } catch (error) {
-      toast.error("Failed to select medication");
-      console.error(error);
-    }
-  };
-  //=============================
-  const [patients, setPatients] = useState<Patients[]>([]);
-  
-
+  // Fetch patients
   useEffect(() => {
+    const fetchPatients = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:8081/select_patient.php",
+          { withCredentials: true }
+        );
+        if (response.data) {
+          setPatients(response.data);
+        }
+      } catch (error) {
+        toast.error("Failed to fetch patients");
+        console.error(error);
+      }
+    };
+
     fetchPatients();
   }, []);
 
-  const fetchPatients = async () => {
-    try {
-      const response = await axios.get(`http://localhost:8081/select_patient.php`, {
-        withCredentials: true
-      });
-      if (response.data) {
-        setPatients(response.data);
-      }
-    } catch (error) {
-      toast.error("Failed to select patient");
-      console.error(error);
-    }
-  };
   const form = useForm<z.infer<typeof prescriptionSchema>>({
     resolver: zodResolver(prescriptionSchema),
     defaultValues: {
       patientId: "",
-      medicineId: "",
+      medicineIds: [],
       prescription: "",
     },
   });
 
   const onSubmit = async (values: z.infer<typeof prescriptionSchema>) => {
+    const selectedPatient = patients.find(
+      (patient) => patient.patient_id === Number(values.patientId)
+    );
+
+
+    if (!selectedPatient) {
+      toast.error("Invalid patient selected");
+      return;
+    }
+
+    console.log("Form Values:", values);
     try {
       const response = await axios.post(
         `http://localhost:8081/create_prescription.php?sym_id=${selectedPatient.sym_id}`,
         values,
         {
-          headers: {
-            "Content-Type": "application/json", // Specify JSON format
-          }, withCredentials: true,
-        },
+          headers: { "Content-Type": "application/json" },
+          withCredentials: true,
+        }
       );
-      console.log(response);
 
       if (response.data.status === "success") {
-        toast.success("Create prescription success");
-        window.location.reload();
+        toast.success("Prescription created successfully");
+        form.reset();
+        setSelectedMedicines([]);
       } else {
-        toast.error(response.data.message || "Create prescription failed");
+        console.log(response.data);
+        toast.error(response.data.message || "Failed to create prescription");
       }
     } catch (error) {
-      toast.error("An error occurred during Create prescription");
+      toast.error("An error occurred while creating prescription");
       console.error(error);
     }
   };
 
-  // Mock patient data - replace with actual API call
-  //const patients = [
-    //{ id: "1", name: "John Doe", symptoms: "Fever and headache" },
-    //{ id: "2", name: "Jane Smith", symptoms: "Cough and sore throat" },
-  //];
-
-  const selectedPatient = patients.find(
-    (patient) => patient.patient_id === Number(form.watch("patientId"))
-  );
-
-  const selectedMedicine = medication.find(
-    (medication) => medication.medication_id === Number(form.watch("medicineId"))
-  );
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -163,20 +140,40 @@ const DoctorDashboard = () => {
         <div className="container mx-auto px-4 py-8">
           <h1 className="text-2xl font-bold mb-6">Doctor Dashboard</h1>
 
-          {/* Render details of selected patient */}
-          {selectedPatient ? (
+          {/* Patient Details */}
+          {form.watch("patientId") && (
             <Card>
               <CardHeader>
-                <CardTitle>Patient: {selectedPatient.fname} {selectedPatient.lname}</CardTitle>
+                <CardTitle>
+                  Patient:{" "}
+                  {
+                    patients.find(
+                      (patient) =>
+                        patient.patient_id === Number(form.watch("patientId"))
+                    )?.fname
+                  }{" "}
+                  {
+                    patients.find(
+                      (patient) =>
+                        patient.patient_id === Number(form.watch("patientId"))
+                    )?.lname
+                  }
+                </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-gray-600">{selectedPatient.sym_description}</p>
+                <p className="text-gray-600">
+                  {
+                    patients.find(
+                      (patient) =>
+                        patient.patient_id === Number(form.watch("patientId"))
+                    )?.sym_description
+                  }
+                </p>
               </CardContent>
             </Card>
-          ) : (
-            <p className="text-gray-600 mb-6">Select a patient to view details.</p>
           )}
 
+          {/* Prescription Form */}
           <Card className="mt-6">
             <CardHeader>
               <CardTitle>Create Prescription</CardTitle>
@@ -187,6 +184,7 @@ const DoctorDashboard = () => {
                   onSubmit={form.handleSubmit(onSubmit)}
                   className="space-y-6"
                 >
+                  {/* Select Patient */}
                   <FormField
                     control={form.control}
                     name="patientId"
@@ -204,7 +202,10 @@ const DoctorDashboard = () => {
                           </FormControl>
                           <SelectContent>
                             {patients.map((patient) => (
-                              <SelectItem key={patient.patient_id} value={patient.patient_id.toString()}>
+                              <SelectItem
+                                key={patient.patient_id}
+                                value={patient.patient_id.toString()}
+                              >
                                 {patient.fname} {patient.lname}
                               </SelectItem>
                             ))}
@@ -213,37 +214,69 @@ const DoctorDashboard = () => {
                       </FormItem>
                     )}
                   />
+
+                  {/* Select Multiple Medicines */}
                   <FormField
                     control={form.control}
-                    name="medicineId"
+                    name="medicineIds"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Select Medicine</FormLabel>
+                        <FormLabel>Select Medicines</FormLabel>
                         <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
+                          onValueChange={(value) => {
+                            if (!field.value.includes(value)) {
+                              field.onChange([...field.value, value]); // Add value
+                              const selected = medication.find(
+                                (med) =>
+                                  med.medication_id === Number(value)
+                              );
+                              if (selected) {
+                                setSelectedMedicines((prev) => [
+                                  ...prev,
+                                  selected,
+                                ]);
+                              }
+                            }
+                          }}
+                          // defaultValue={field.value}
+                          // multiple // Enable multiple selection
                         >
                           <FormControl>
                             <SelectTrigger>
-                              <SelectValue placeholder="Select a medicine" />
+                              <SelectValue placeholder="Select medicines" />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {medication.map((medication) => (
-                              <SelectItem key={medication.medication_id} value={medication.medication_id.toString()}>
-                                {medication.name}
+                            {medication.map((med) => (
+                              <SelectItem
+                                key={med.medication_id}
+                                value={med.medication_id.toString()}
+                              >
+                                {med.name}
                               </SelectItem>
                             ))}
                           </SelectContent>
                         </Select>
-                        {selectedMedicine && (
-                          <p className="text-sm text-gray-500 mt-1">
-                            {selectedMedicine.description}
-                          </p>
+                        {selectedMedicines.length > 0 && (
+                          <div className="mt-2">
+                            <p className="font-semibold">Selected Medicines:</p>
+                            <ul>
+                              {selectedMedicines.map((med) => (
+                                <li
+                                  key={med.medication_id}
+                                  className="text-sm text-gray-500"
+                                >
+                                  {med.name} - {med.description}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
                         )}
                       </FormItem>
                     )}
                   />
+
+                  {/* Prescription Details */}
                   <FormField
                     control={form.control}
                     name="prescription"
@@ -260,6 +293,7 @@ const DoctorDashboard = () => {
                       </FormItem>
                     )}
                   />
+
                   <Button type="submit">Create Prescription</Button>
                 </form>
               </Form>
@@ -270,6 +304,5 @@ const DoctorDashboard = () => {
     </div>
   );
 };
-
 
 export default DoctorDashboard;
