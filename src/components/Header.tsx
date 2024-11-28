@@ -23,7 +23,7 @@ const Header = () => {
     >
       <div className="container mx-auto px-6 h-20 flex items-center justify-between">
         <h1 className="text-2xl font-bold text-hospital-primary">
-          Hospital Name
+          CSS326 Hospital
         </h1>
         <div className="flex items-center space-x-4">
           {/* Add additional header content here */}
