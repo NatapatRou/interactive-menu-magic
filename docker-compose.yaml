@@ -23,8 +23,8 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: root 
       # MYSQL_DATABASE: med_disperse
-      MYSQL_USER: admin
-      MYSQL_PASSWORD: admin
+      # MYSQL_USER: admin
+      # MYSQL_PASSWORD: admin
     ports:
       - "9906:3306"
     volumes:

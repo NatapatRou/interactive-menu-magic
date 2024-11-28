@@ -3,6 +3,6 @@
     header("Content-Type: application/json");
     header("Access-Control-Allow-Origin: *");
 
-    $result =  $API->select_all_user();
-    echo $result[0]['fname'];
+    $result =  $API->select_first_available();
+    echo $result[0]['id'];
 ?>

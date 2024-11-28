@@ -16,7 +16,9 @@ if (isset($data["fname"], $data["lname"], $data["email"], $data["password"])) {
     $fname = $data["fname"];
     $lname = $data["lname"];
     $email = $data["email"];
-    $password = password_hash($data["password"], PASSWORD_BCRYPT); // Encrypt password
+    // $password = password_hash($data["password"], PASSWORD_BCRYPT); // Encrypt password
+    $password = $data["password"]; 
+    $key = $data["fname"];
     $gender = $data["gender"];
     $dob = $data["date_of_birth"];
     $contact = $data["contact_info"];
@@ -26,7 +28,7 @@ if (isset($data["fname"], $data["lname"], $data["email"], $data["password"])) {
     try {
         // Prepare SQL query
         $sql = "INSERT INTO Patient (fname, lname, email, password, gender, date_of_birth, contact_info, address, emergency_contact) 
-                VALUES (:fname, :lname, :email, :password, :gender, :dob, :contact, :address, :emergency_contact)";
+                VALUES (:fname, :lname, :email, AES_ENCRYPT(:password, SHA1(:key)), :gender, :dob, :contact, :address, :emergency_contact)";
         $stmt = $conn->prepare($sql);
 
         // Bind parameters
@@ -34,6 +36,7 @@ if (isset($data["fname"], $data["lname"], $data["email"], $data["password"])) {
         $stmt->bindParam(':lname', $lname);
         $stmt->bindParam(':email', $email);
         $stmt->bindParam(':password', $password);
+        $stmt->bindParam(':key', $key);
         $stmt->bindParam(':gender', $gender);
         $stmt->bindParam(':dob', $dob);
         $stmt->bindParam(':contact', $contact);

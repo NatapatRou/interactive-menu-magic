@@ -1,7 +1,7 @@
 <?php
     require_once __DIR__ . '/config.php';
     class API {
-        function select_patience() {
+        function select_patience():bool {
             $db = new Connect;
             $users = array();
             $data = $db->prepare("SELECT * FROM Patient");
@@ -19,7 +19,7 @@
             return json_encode($users);
         }             
 
-        function select_doctor() {
+        function select_doctor():bool {
             $db = new Connect;
             $users = array();
             $data = $db->prepare("SELECT * FROM Doctor");
@@ -37,7 +37,7 @@
             return json_encode($users);
         }
 
-        function select_phramacist() {
+        function select_phramacist():bool {
             $db = new Connect;
             $users = array();
             $data = $db->prepare("SELECT * FROM Pharmacist");
@@ -55,7 +55,7 @@
             return json_encode($users);
         }
 
-        function select_all_user() {
+        function select_all_user():array {
             $db = new Connect;
             $users = array();
         // Use this if don't have role column in schema
@@ -79,18 +79,36 @@
                     'fname' => $results['fname'],
                     'lname' => $results['lname'],
                     'email' => $results['email'],
-                    'password' => $results['password'],
+                    // 'password' => $results['password'],
                 );
             }
             return $users;
         }
 
-        function select_all_available() {
+        function select_all_available(): array {
             $db = new Connect;
             $users = array();
             $data = $db->prepare("id, fname, lname, status FROM Doctor WHERE status = 'Available'
     UNION ALL
     SELECT id, fname, lname, status FROM Pharmacist WHERE status = 'Available'");
+            $data->execute();
+        // The fetch() method is called on a PDO statement object (e.g., $data in your example) after executing a query. It retrieves the next row from the result set.
+            while($results = $data->fetch(PDO::FETCH_ASSOC)){ // use fetch with while because we want to select a column individually
+                # use like dict -> "id": f"{result['id]}" | key:value
+                $users[] = array(
+                    'id' => $results['id'],
+                    'fname' => $results['fname'],
+                    'lname' => $results['lname'],
+                    'status' => $results['status'],
+                );
+            }
+            return $users;
+        }
+
+        function select_first_available(): array {
+            $db = new Connect;
+            $users = array();
+            $data = $db->prepare("(SELECT id, fname, lname, status FROM Doctor WHERE status = 'Available' LIMIT 1) UNION ALL (SELECT id, fname, lname, status FROM Pharmacist WHERE status = 'Available' LIMIT 1);");
             $data->execute();
         // The fetch() method is called on a PDO statement object (e.g., $data in your example) after executing a query. It retrieves the next row from the result set.
             while($results = $data->fetch(PDO::FETCH_ASSOC)){

@@ -23,7 +23,11 @@ const Sidebar = () => {
   const navigate = useNavigate();
   
   // Check if user is on a dashboard page
-  const isLoggedIn = location.pathname.includes('dashboard');
+  const loggedInPaths = ['dashboard', 'patient']
+  const isLoggedIn = loggedInPaths.some(path => 
+  location.pathname.toLowerCase().includes(path.toLowerCase())
+);
+  // const isLoggedIn = location.pathname.includes('dashboard');
   
   const handleLogout = async (path: string) => {
     if (path === '/login') {

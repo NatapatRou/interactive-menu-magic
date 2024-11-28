@@ -18,7 +18,7 @@ CREATE TABLE Doctor (
 	gender VARCHAR(10) NOT NULL,
     contact_info VARCHAR(255),
     email VARCHAR(255) UNIQUE NOT NULL,
-    password VARCHAR(255) NOT NULL,
+    password VARBINARY(255) NOT NULL,
     date_register DATE DEFAULT (CURRENT_DATE),
     specialization VARCHAR(100),
     license_number VARCHAR(50) UNIQUE,
@@ -35,7 +35,7 @@ CREATE TABLE Patient (
 	date_of_birth DATE,
     contact_info VARCHAR(255),
     email VARCHAR(255) UNIQUE NOT NULL,
-    password VARCHAR(255) NOT NULL,
+    password VARBINARY(255) NOT NULL,
     date_register DATE DEFAULT (CURRENT_DATE),
     address VARCHAR(255),
     emergency_contact VARCHAR(255),
@@ -50,7 +50,7 @@ CREATE TABLE Pharmacist (
 	gender VARCHAR(10) NOT NULL,
     contact_info VARCHAR(255),
     email VARCHAR(255) UNIQUE NOT NULL,
-    password VARCHAR(255) NOT NULL,
+    password VARBINARY(255) NOT NULL,
     date_register DATE DEFAULT (CURRENT_DATE),
     license_number VARCHAR(50) UNIQUE,
     work_shift ENUM('Morning', 'Afternoon', 'Night'),
@@ -84,22 +84,26 @@ CREATE TABLE Prescription (
     doctor_id INT NOT NULL,             -- References doctor 
     patient_id INT NOT NULL,            -- References patient 
     pharmacist_id INT NOT NULL,			-- References phramacist 
+    medication_id INT NOT NULL,         -- References medication
     date_issued DATE DEFAULT (CURRENT_DATE),
     status ENUM('Pending', 'Confirmed', 'Dispensed') DEFAULT 'Pending',
     notes TEXT,
-    dosage_instructions TEXT,
     CONSTRAINT fk_PresDoc FOREIGN KEY (doctor_id) REFERENCES Doctor(id) ON DELETE CASCADE,
     CONSTRAINT fk_PresPatient FOREIGN KEY (patient_id) REFERENCES Patient(id) ON DELETE CASCADE,
-    CONSTRAINT fk_PresParma FOREIGN KEY (pharmacist_id) REFERENCES Pharmacist(id) ON DELETE CASCADE
+    CONSTRAINT fk_PresParma FOREIGN KEY (pharmacist_id) REFERENCES Pharmacist(id) ON DELETE CASCADE,
+    CONSTRAINT fk_PresMed FOREIGN KEY (medication_id) REFERENCES Medication(medication_id) ON DELETE CASCADE
 );
 
 -- Create Symptom_statement Table
-CREATE TABLE Symptom_statament(
+CREATE TABLE Symptom_statement(
 	sym_id INT PRIMARY KEY auto_increment,
     patient_id INT NOT NULL,
+    doctor_id INT NOT NULL,
     date_issued DATE DEFAULT (CURRENT_DATE),
+    status ENUM('Pending', 'Confirmed') DEFAULT 'Pending',
 	sym_description TEXT,
-    CONSTRAINT fk_PatientSym FOREIGN KEY (patient_id) REFERENCES Patient(id) ON DELETE CASCADE
+    CONSTRAINT fk_PatientSym FOREIGN KEY (patient_id) REFERENCES Patient(id) ON DELETE CASCADE,
+    CONSTRAINT fk_DoctorSym FOREIGN KEY (doctor_id) REFERENCES Doctor(id) ON DELETE CASCADE
 );
 
 -- Create  Table Medication_detail
@@ -111,45 +115,84 @@ CREATE TABLE Medication_datail(
     CONSTRAINT fk_MedMeddetail FOREIGN KEY (medication_id) REFERENCES Medication(medication_id)
 );
 
+-- INSERT INTO Doctor (id, fname, lname, gender, contact_info, email, password, specialization, license_number, status)
+-- VALUES
+-- (1, 'John', 'Doe', 'Male', '555-1234', 'johndoe@example.com', 'password123', 'Cardiology', 'DOC12345', 'Available'),
+-- (2, 'Alice', 'Smith', 'Female', '555-5678', 'alicesmith@example.com', 'password456', 'Neurology', 'DOC12346', 'Available'),
+-- (3, 'Bob', 'Brown', 'Male', '555-9012', 'bobbrown@example.com', 'password789', 'Pediatrics', 'DOC12347', 'Available'),
+-- (4, 'Karen', 'Taylor', 'Female', '555-3456', 'karentaylor@example.com', 'password101', 'Dermatology', 'DOC12348', 'Available'),
+-- (5, 'Michael', 'Johnson', 'Male', '555-6789', 'michaeljohnson@example.com', 'password102', 'Oncology', 'DOC12349', 'Available'),
+-- (6, 'Emma', 'Davis', 'Female', '555-1122', 'emmadavis@example.com', 'password103', 'Orthopedics', 'DOC12350', 'Available'),
+-- (7, 'James', 'Wilson', 'Male', '555-3344', 'jameswilson@example.com', 'password104', 'Psychiatry', 'DOC12351', 'Available'),
+-- (8, 'Olivia', 'Miller', 'Female', '555-5566', 'oliviamiller@example.com', 'password105', 'Gynecology', 'DOC12352', 'Available'),
+-- (9, 'William', 'Moore', 'Male', '555-7788', 'williammoore@example.com', 'password106', 'Surgery', 'DOC12353', 'Available'),
+-- (10, 'Sophia', 'Anderson', 'Female', '555-9900', 'sophiaanderson@example.com', 'password107', 'Endocrinology', 'DOC12354', 'Available');
+--
+-- INSERT INTO Patient (id, fname, lname, gender, date_of_birth, contact_info, email, password, address, emergency_contact)
+-- VALUES
+-- (1, 'Ethan', 'Walker', 'Male', '1985-06-15', '555-0011', 'ethanwalker@example.com', 'securepass1', '123 Main St', '555-1011'),
+-- (2, 'Mia', 'Hall', 'Female', '1990-03-22', '555-0022', 'miahall@example.com', 'securepass2', '456 Oak St', '555-2022'),
+-- (3, 'Lucas', 'Young', 'Male', '1987-12-11', '555-0033', 'lucasyoung@example.com', 'securepass3', '789 Pine St', '555-3033'),
+-- (4, 'Emma', 'Harris', 'Female', '1993-07-04', '555-0044', 'emmaharris@example.com', 'securepass4', '101 Maple St', '555-4044'),
+-- (5, 'Noah', 'Clark', 'Male', '1989-09-16', '555-0055', 'noahclark@example.com', 'securepass5', '202 Birch St', '555-5055'),
+-- (6, 'Sophia', 'Lewis', 'Female', '1992-11-20', '555-0066', 'sophialewis@example.com', 'securepass6', '303 Cedar St', '555-6066'),
+-- (7, 'Liam', 'Robinson', 'Male', '1988-05-30', '555-0077', 'liamrobinson@example.com', 'securepass7', '404 Spruce St', '555-7077'),
+-- (8, 'Ava', 'Walker', 'Female', '1991-08-15', '555-0088', 'avawalker@example.com', 'securepass8', '505 Elm St', '555-8088'),
+-- (9, 'Oliver', 'White', 'Male', '1986-01-23', '555-0099', 'oliverwhite@example.com', 'securepass9', '606 Willow St', '555-9099'),
+-- (10, 'Isabella', 'Martinez', 'Female', '1994-10-02', '555-0100', 'isabellamartinez@example.com', 'securepass10', '707 Aspen St', '555-0101');
+--
+-- INSERT INTO Pharmacist (id, fname, lname, gender, contact_info, email, password, license_number, work_shift, status)
+-- VALUES
+-- (1, 'Liam', 'Gray', 'Male', '555-1111', 'liamgray@example.com', 'pharma1', 'PHA10001', 'Morning', 'Available'),
+-- (2, 'Sophia', 'Clark', 'Female', '555-2222', 'sophiaclark@example.com', 'pharma2', 'PHA10002', 'Afternoon', 'Available'),
+-- (3, 'Mason', 'Hill', 'Male', '555-3333', 'masonhill@example.com', 'pharma3', 'PHA10003', 'Night', 'Available'),
+-- (4, 'Ella', 'Scott', 'Female', '555-4444', 'ellascott@example.com', 'pharma4', 'PHA10004', 'Morning', 'Available'),
+-- (5, 'James', 'Adams', 'Male', '555-5555', 'jamesadams@example.com', 'pharma5', 'PHA10005', 'Afternoon', 'Available'),
+-- (6, 'Ava', 'Green', 'Female', '555-6666', 'avagreen@example.com', 'pharma6', 'PHA10006', 'Night', 'Available'),
+-- (7, 'Ethan', 'Baker', 'Male', '555-7777', 'ethanbaker@example.com', 'pharma7', 'PHA10007', 'Morning', 'Available'),
+-- (8, 'Olivia', 'Wright', 'Female', '555-8888', 'oliviawright@example.com', 'pharma8', 'PHA10008', 'Afternoon', 'Available'),
+-- (9, 'Noah', 'King', 'Male', '555-9999', 'noahking@example.com', 'pharma9', 'PHA10009', 'Night', 'Available'),
+-- (10, 'Emma', 'Allen', 'Female', '555-0000', 'emmaallen@example.com', 'pharma10', 'PHA10010', 'Morning', 'Available');
+--
 
 INSERT INTO Doctor (id, fname, lname, gender, contact_info, email, password, specialization, license_number, status)
 VALUES
-(1, 'John', 'Doe', 'Male', '555-1234', 'johndoe@example.com', 'password123', 'Cardiology', 'DOC12345', 'Available'),
-(2, 'Alice', 'Smith', 'Female', '555-5678', 'alicesmith@example.com', 'password456', 'Neurology', 'DOC12346', 'Available'),
-(3, 'Bob', 'Brown', 'Male', '555-9012', 'bobbrown@example.com', 'password789', 'Pediatrics', 'DOC12347', 'Available'),
-(4, 'Karen', 'Taylor', 'Female', '555-3456', 'karentaylor@example.com', 'password101', 'Dermatology', 'DOC12348', 'Available'),
-(5, 'Michael', 'Johnson', 'Male', '555-6789', 'michaeljohnson@example.com', 'password102', 'Oncology', 'DOC12349', 'Available'),
-(6, 'Emma', 'Davis', 'Female', '555-1122', 'emmadavis@example.com', 'password103', 'Orthopedics', 'DOC12350', 'Available'),
-(7, 'James', 'Wilson', 'Male', '555-3344', 'jameswilson@example.com', 'password104', 'Psychiatry', 'DOC12351', 'Available'),
-(8, 'Olivia', 'Miller', 'Female', '555-5566', 'oliviamiller@example.com', 'password105', 'Gynecology', 'DOC12352', 'Available'),
-(9, 'William', 'Moore', 'Male', '555-7788', 'williammoore@example.com', 'password106', 'Surgery', 'DOC12353', 'Available'),
-(10, 'Sophia', 'Anderson', 'Female', '555-9900', 'sophiaanderson@example.com', 'password107', 'Endocrinology', 'DOC12354', 'Available');
+(1, 'John', 'Doe', 'Male', '555-1234', 'johndoe@example.com', AES_ENCRYPT('password123', SHA1('John')), 'Cardiology', 'DOC12345', 'Available'),
+(2, 'Alice', 'Smith', 'Female', '555-5678', 'alicesmith@example.com', AES_ENCRYPT('password456', SHA1('Alice')), 'Neurology', 'DOC12346', 'Available'),
+(3, 'Bob', 'Brown', 'Male', '555-9012', 'bobbrown@example.com', AES_ENCRYPT('password789', SHA1('Bob')), 'Pediatrics', 'DOC12347', 'Available'),
+(4, 'Karen', 'Taylor', 'Female', '555-3456', 'karentaylor@example.com', AES_ENCRYPT('password101', SHA1('Karen')), 'Dermatology', 'DOC12348', 'Available'),
+(5, 'Michael', 'Johnson', 'Male', '555-6789', 'michaeljohnson@example.com', AES_ENCRYPT('password102', SHA1('Michael')), 'Oncology', 'DOC12349', 'Available'),
+(6, 'Emma', 'Davis', 'Female', '555-1122', 'emmadavis@example.com', AES_ENCRYPT('password103', SHA1('Emma')), 'Orthopedics', 'DOC12350', 'Available'),
+(7, 'James', 'Wilson', 'Male', '555-3344', 'jameswilson@example.com', AES_ENCRYPT('password104', SHA1('James')), 'Psychiatry', 'DOC12351', 'Available'),
+(8, 'Olivia', 'Miller', 'Female', '555-5566', 'oliviamiller@example.com', AES_ENCRYPT('password105', SHA1('Olivia')), 'Gynecology', 'DOC12352', 'Available'),
+(9, 'William', 'Moore', 'Male', '555-7788', 'williammoore@example.com', AES_ENCRYPT('password106', SHA1('William')), 'Surgery', 'DOC12353', 'Available'),
+(10, 'Sophia', 'Anderson', 'Female', '555-9900', 'sophiaanderson@example.com', AES_ENCRYPT('password107', SHA1('Sophia')), 'Endocrinology', 'DOC12354', 'Available');
 
 INSERT INTO Patient (id, fname, lname, gender, date_of_birth, contact_info, email, password, address, emergency_contact)
 VALUES
-(1, 'Ethan', 'Walker', 'Male', '1985-06-15', '555-0011', 'ethanwalker@example.com', 'securepass1', '123 Main St', '555-1011'),
-(2, 'Mia', 'Hall', 'Female', '1990-03-22', '555-0022', 'miahall@example.com', 'securepass2', '456 Oak St', '555-2022'),
-(3, 'Lucas', 'Young', 'Male', '1987-12-11', '555-0033', 'lucasyoung@example.com', 'securepass3', '789 Pine St', '555-3033'),
-(4, 'Emma', 'Harris', 'Female', '1993-07-04', '555-0044', 'emmaharris@example.com', 'securepass4', '101 Maple St', '555-4044'),
-(5, 'Noah', 'Clark', 'Male', '1989-09-16', '555-0055', 'noahclark@example.com', 'securepass5', '202 Birch St', '555-5055'),
-(6, 'Sophia', 'Lewis', 'Female', '1992-11-20', '555-0066', 'sophialewis@example.com', 'securepass6', '303 Cedar St', '555-6066'),
-(7, 'Liam', 'Robinson', 'Male', '1988-05-30', '555-0077', 'liamrobinson@example.com', 'securepass7', '404 Spruce St', '555-7077'),
-(8, 'Ava', 'Walker', 'Female', '1991-08-15', '555-0088', 'avawalker@example.com', 'securepass8', '505 Elm St', '555-8088'),
-(9, 'Oliver', 'White', 'Male', '1986-01-23', '555-0099', 'oliverwhite@example.com', 'securepass9', '606 Willow St', '555-9099'),
-(10, 'Isabella', 'Martinez', 'Female', '1994-10-02', '555-0100', 'isabellamartinez@example.com', 'securepass10', '707 Aspen St', '555-0101');
+(1, 'Ethan', 'Walker', 'Male', '1985-06-15', '555-0011', 'ethanwalker@example.com', AES_ENCRYPT('securepass1', SHA1('Ethan')), '123 Main St', '555-1011'),
+(2, 'Mia', 'Hall', 'Female', '1990-03-22', '555-0022', 'miahall@example.com', AES_ENCRYPT('securepass2', SHA1('Mia')), '456 Oak St', '555-2022'),
+(3, 'Lucas', 'Young', 'Male', '1987-12-11', '555-0033', 'lucasyoung@example.com', AES_ENCRYPT('securepass3', SHA1('Lucas')), '789 Pine St', '555-3033'),
+(4, 'Emma', 'Harris', 'Female', '1993-07-04', '555-0044', 'emmaharris@example.com', AES_ENCRYPT('securepass4', SHA1('Emma')), '101 Maple St', '555-4044'),
+(5, 'Noah', 'Clark', 'Male', '1989-09-16', '555-0055', 'noahclark@example.com', AES_ENCRYPT('securepass5', SHA1('Noah')), '202 Birch St', '555-5055'),
+(6, 'Sophia', 'Lewis', 'Female', '1992-11-20', '555-0066', 'sophialewis@example.com', AES_ENCRYPT('securepass6', SHA1('Sophia')), '303 Cedar St', '555-6066'),
+(7, 'Liam', 'Robinson', 'Male', '1988-05-30', '555-0077', 'liamrobinson@example.com', AES_ENCRYPT('securepass7', SHA1('Liam')), '404 Spruce St', '555-7077'),
+(8, 'Ava', 'Walker', 'Female', '1991-08-15', '555-0088', 'avawalker@example.com', AES_ENCRYPT('securepass8', SHA1('Ava')), '505 Elm St', '555-8088'),
+(9, 'Oliver', 'White', 'Male', '1986-01-23', '555-0099', 'oliverwhite@example.com', AES_ENCRYPT('securepass9', SHA1('Oliver')), '606 Willow St', '555-9099'),
+(10, 'Isabella', 'Martinez', 'Female', '1994-10-02', '555-0100', 'isabellamartinez@example.com', AES_ENCRYPT('securepass10', SHA1('Isabella')), '707 Aspen St', '555-0101');
 
 INSERT INTO Pharmacist (id, fname, lname, gender, contact_info, email, password, license_number, work_shift, status)
 VALUES
-(1, 'Liam', 'Gray', 'Male', '555-1111', 'liamgray@example.com', 'pharma1', 'PHA10001', 'Morning', 'Available'),
-(2, 'Sophia', 'Clark', 'Female', '555-2222', 'sophiaclark@example.com', 'pharma2', 'PHA10002', 'Afternoon', 'Available'),
-(3, 'Mason', 'Hill', 'Male', '555-3333', 'masonhill@example.com', 'pharma3', 'PHA10003', 'Night', 'Available'),
-(4, 'Ella', 'Scott', 'Female', '555-4444', 'ellascott@example.com', 'pharma4', 'PHA10004', 'Morning', 'Available'),
-(5, 'James', 'Adams', 'Male', '555-5555', 'jamesadams@example.com', 'pharma5', 'PHA10005', 'Afternoon', 'Available'),
-(6, 'Ava', 'Green', 'Female', '555-6666', 'avagreen@example.com', 'pharma6', 'PHA10006', 'Night', 'Available'),
-(7, 'Ethan', 'Baker', 'Male', '555-7777', 'ethanbaker@example.com', 'pharma7', 'PHA10007', 'Morning', 'Available'),
-(8, 'Olivia', 'Wright', 'Female', '555-8888', 'oliviawright@example.com', 'pharma8', 'PHA10008', 'Afternoon', 'Available'),
-(9, 'Noah', 'King', 'Male', '555-9999', 'noahking@example.com', 'pharma9', 'PHA10009', 'Night', 'Available'),
-(10, 'Emma', 'Allen', 'Female', '555-0000', 'emmaallen@example.com', 'pharma10', 'PHA10010', 'Morning', 'Available');
+(1, 'Liam', 'Gray', 'Male', '555-1111', 'liamgray@example.com', AES_ENCRYPT('pharma1', SHA1('Liam')), 'PHA10001', 'Morning', 'Available'),
+(2, 'Sophia', 'Clark', 'Female', '555-2222', 'sophiaclark@example.com', AES_ENCRYPT('pharma2', SHA1('Sophia')), 'PHA10002', 'Afternoon', 'Available'),
+(3, 'Mason', 'Hill', 'Male', '555-3333', 'masonhill@example.com', AES_ENCRYPT('pharma3', SHA1('Mason')), 'PHA10003', 'Night', 'Available'),
+(4, 'Ella', 'Scott', 'Female', '555-4444', 'ellascott@example.com', AES_ENCRYPT('pharma4', SHA1('Ella')), 'PHA10004', 'Morning', 'Available'),
+(5, 'James', 'Adams', 'Male', '555-5555', 'jamesadams@example.com', AES_ENCRYPT('pharma5', SHA1('James')), 'PHA10005', 'Afternoon', 'Available'),
+(6, 'Ava', 'Green', 'Female', '555-6666', 'avagreen@example.com', AES_ENCRYPT('pharma6', SHA1('Ava')), 'PHA10006', 'Night', 'Available'),
+(7, 'Ethan', 'Baker', 'Male', '555-7777', 'ethanbaker@example.com', AES_ENCRYPT('pharma7', SHA1('Ethan')), 'PHA10007', 'Morning', 'Available'),
+(8, 'Olivia', 'Wright', 'Female', '555-8888', 'oliviawright@example.com', AES_ENCRYPT('pharma8', SHA1('Olivia')), 'PHA10008', 'Afternoon', 'Available'),
+(9, 'Noah', 'King', 'Male', '555-9999', 'noahking@example.com', AES_ENCRYPT('pharma9', SHA1('Noah')), 'PHA10009', 'Night', 'Available'),
+(10, 'Emma', 'Allen', 'Female', '555-0000', 'emmaallen@example.com', AES_ENCRYPT('pharma10', SHA1('Emma')), 'PHA10010', 'Morning', 'Available');
 
 INSERT INTO Medication (name, description, dosage_form, strength, quantity_in_stock, expiration_date, manufacturer)
 VALUES
@@ -164,31 +207,31 @@ VALUES
 ('Azithromycin', 'Antibiotic for infections', 'Tablet', '250mg', 120, '2025-08-08', 'PharmaPlus'),
 ('Aspirin', 'Pain relief and blood thinner', 'Tablet', '81mg', 500, '2025-09-18', 'HealthFirst');
 
-INSERT INTO Prescription (doctor_id, patient_id, pharmacist_id, date_issued, status, notes, dosage_instructions)
-VALUES
-(1, 1, 1, '2024-11-20', 'Pending', 'Pain management', 'Take 1 tablet every 8 hours'),
-(2, 2, 2, '2024-11-19', 'Confirmed', 'Antibiotic course', 'Take 2 capsules daily for 7 days'),
-(3, 3, 3, '2024-11-18', 'Dispensed', 'Fever reduction', 'Take 1 tablet twice a day'),
-(4, 4, 4, '2024-11-17', 'Pending', 'Allergy relief', 'Take 1 tablet at bedtime'),
-(5, 5, 5, '2024-11-16', 'Dispensed', 'Diabetes management', 'Take 1 tablet with breakfast'),
-(6, 6, 6, '2024-11-15', 'Confirmed', 'Acid reflux treatment', 'Take 1 capsule 30 minutes before meals'),
-(7, 7, 7, '2024-11-14', 'Pending', 'Cholesterol control', 'Take 1 tablet at night'),
-(8, 8, 8, '2024-11-13', 'Dispensed', 'Infection control', 'Take 1 tablet daily for 5 days'),
-(9, 9, 9, '2024-11-12', 'Confirmed', 'Pain relief', 'Take 1 tablet as needed, up to 3 times a day'),
-(10, 10, 10, '2024-11-11', 'Pending', 'General health', 'Take 1 tablet every morning');
+-- INSERT INTO Prescription (doctor_id, patient_id, pharmacist_id, date_issued, status, notes, dosage_instructions)
+-- VALUES
+-- (1, 1, 1, '2024-11-20', 'Pending', 'Pain management', 'Take 1 tablet every 8 hours'),
+-- (2, 2, 2, '2024-11-19', 'Confirmed', 'Antibiotic course', 'Take 2 capsules daily for 7 days'),
+-- (3, 3, 3, '2024-11-18', 'Dispensed', 'Fever reduction', 'Take 1 tablet twice a day'),
+-- (4, 4, 4, '2024-11-17', 'Pending', 'Allergy relief', 'Take 1 tablet at bedtime'),
+-- (5, 5, 5, '2024-11-16', 'Dispensed', 'Diabetes management', 'Take 1 tablet with breakfast'),
+-- (6, 6, 6, '2024-11-15', 'Confirmed', 'Acid reflux treatment', 'Take 1 capsule 30 minutes before meals'),
+-- (7, 7, 7, '2024-11-14', 'Pending', 'Cholesterol control', 'Take 1 tablet at night'),
+-- (8, 8, 8, '2024-11-13', 'Dispensed', 'Infection control', 'Take 1 tablet daily for 5 days'),
+-- (9, 9, 9, '2024-11-12', 'Confirmed', 'Pain relief', 'Take 1 tablet as needed, up to 3 times a day'),
+-- (10, 10, 10, '2024-11-11', 'Pending', 'General health', 'Take 1 tablet every morning');
 
-INSERT INTO Symptom_statament (patient_id, date_issued, sym_description)
-VALUES
-(1, '2024-11-20', 'Fever and chills'),
-(2, '2024-11-19', 'Severe headache and nausea'),
-(3, '2024-11-18', 'Sore throat and cough'),
-(4, '2024-11-17', 'Skin rash and itching'),
-(5, '2024-11-16', 'Frequent urination and thirst'),
-(6, '2024-11-15', 'Stomach pain and acid reflux'),
-(7, '2024-11-14', 'Chest pain during exertion'),
-(8, '2024-11-13', 'Nasal congestion and sneezing'),
-(9, '2024-11-12', 'Joint pain and swelling'),
-(10, '2024-11-11', 'Fatigue and dizziness');
+-- INSERT INTO Symptom_statament (patient_id, date_issued, sym_description)
+-- VALUES
+-- (1, '2024-11-20', 'Fever and chills'),
+-- (2, '2024-11-19', 'Severe headache and nausea'),
+-- (3, '2024-11-18', 'Sore throat and cough'),
+-- (4, '2024-11-17', 'Skin rash and itching'),
+-- (5, '2024-11-16', 'Frequent urination and thirst'),
+-- (6, '2024-11-15', 'Stomach pain and acid reflux'),
+-- (7, '2024-11-14', 'Chest pain during exertion'),
+-- (8, '2024-11-13', 'Nasal congestion and sneezing'),
+-- (9, '2024-11-12', 'Joint pain and swelling'),
+-- (10, '2024-11-11', 'Fatigue and dizziness');
 
 INSERT INTO Medication_datail (prescription_id, medication_id)
 VALUES
@@ -204,6 +247,10 @@ VALUES
 (10, 10);
 
 
+CREATE USER 'admin'@'%' IDENTIFIED BY 'admin';
+GRANT SELECT, INSERT, DELETE ON drug_dispense.Doctor TO 'admin'@'%';
+GRANT SELECT, INSERT, DELETE ON drug_dispense.Patient TO 'admin'@'%';
+GRANT SELECT, INSERT, DELETE ON drug_dispense.Pharmacist TO 'admin'@'%';
 
 
 
