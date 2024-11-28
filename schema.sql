@@ -84,14 +84,13 @@ CREATE TABLE Prescription (
     doctor_id INT NOT NULL,             -- References doctor 
     patient_id INT NOT NULL,            -- References patient 
     pharmacist_id INT NOT NULL,			-- References phramacist 
-    medication_id INT NOT NULL,         -- References medication
     date_issued DATE DEFAULT (CURRENT_DATE),
     status ENUM('Pending', 'Confirmed', 'Dispensed') DEFAULT 'Pending',
     notes TEXT,
     CONSTRAINT fk_PresDoc FOREIGN KEY (doctor_id) REFERENCES Doctor(id) ON DELETE CASCADE,
     CONSTRAINT fk_PresPatient FOREIGN KEY (patient_id) REFERENCES Patient(id) ON DELETE CASCADE,
-    CONSTRAINT fk_PresParma FOREIGN KEY (pharmacist_id) REFERENCES Pharmacist(id) ON DELETE CASCADE,
-    CONSTRAINT fk_PresMed FOREIGN KEY (medication_id) REFERENCES Medication(medication_id) ON DELETE CASCADE
+    CONSTRAINT fk_PresParma FOREIGN KEY (pharmacist_id) REFERENCES Pharmacist(id) ON DELETE CASCADE
+    -- CONSTRAINT fk_PresMed FOREIGN KEY (medication_id) REFERENCES Medication(medication_id) ON DELETE CASCADE
 );
 
 -- Create Symptom_statement Table
