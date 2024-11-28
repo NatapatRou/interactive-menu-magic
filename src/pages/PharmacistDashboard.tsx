@@ -124,7 +124,8 @@ const PharmacistDashboard = () => {
         console.log("Current Form Values:", values); 
       if (response.data.status === "success") {
         toast.success("Dispensing prescription successful");
-        // window.location.reload();
+        form.reset();
+        window.location.reload();
       } else {
         console.log(response.data);
         toast.error(response.data.message || "Dispensing prescription failed");
