@@ -121,6 +121,7 @@ const DoctorDashboard = () => {
       if (response.data.status === "success") {
         toast.success("Prescription created successfully");
         form.reset();
+        toast.success("Create prescription successful");
         window.location.reload();
         setSelectedMedicines([]);
       } else {
