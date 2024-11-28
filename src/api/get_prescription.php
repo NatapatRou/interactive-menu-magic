@@ -10,12 +10,14 @@ require_once __DIR__ . '/config.php';
 $conn = new Connect();
 $pharmacist_id = $_SESSION['id'];
 try{
-    $sql = "SELECT p.prescription_id, p.patient_id, CONCAT(pa.fname, ' ', pa.lname) AS patient_name, p.doctor_id, p.pharmacist_id, m.medication_id, m.name AS med_name, m.description, p.notes 
+    $sql = "SELECT p.prescription_id, p.patient_id, CONCAT(pa.fname, ' ', pa.lname) AS patient_name, p.doctor_id,  p.pharmacist_id, m.name AS med_name, m.medication_id,  m.description, p.notes 
     FROM Prescription p
     JOIN Patient pa
     ON p.patient_id = pa.id
+    JOIN Medication_detail md
+    ON p.prescription_id = md.prescription_id
     JOIN Medication m
-    ON p.medication_id = m.medication_id 
+    ON m.medication_id = md.medication_id 
     WHERE pharmacist_id = :pharmacist_id AND p.status = 'Pending'";
 
     $get_stmt = $conn->prepare($sql);

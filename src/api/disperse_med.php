@@ -15,13 +15,25 @@ try
 {
     $pharmacist_id = $_SESSION['id'];
     $prescription_id = $data['prescriptionId'];
-    $medication_id = $_GET['med_id'];
 
+   // Begin a transaction
+    $conn->beginTransaction();   
+
+    // Get medication id which related to this prescription form medication_detail
+    $med_get = "SELECT medication_id FROM Medication_detail WHERE prescription_id = :prescription_id";
+    $med_get_stmt = $conn->prepare($med_get);
+    $med_get_stmt->bindParam(':prescription_id', $prescription_id);
+    $med_get_stmt->execute();
+    
+    $med_id_arr = $med_get_stmt->fetchAll(PDO::FETCH_ASSOC);
     // reduce med in stock
-    $update_medication = "UPDATE Medication SET quantity_in_stock =  quantity_in_stock - 1 WHERE medication_id = :medication_id";
-    $update_med_stmt = $conn->prepare($update_medication);
-    $update_med_stmt->bindParam('medication_id', $medication_id);
-    $update_med_stmt->execute();
+    foreach($med_id_arr AS $med_id){
+    // echo "<script>console.log('Debug Objects: " . $med_id['medication_id'] . "' );</script>";
+        $update_medication = "UPDATE Medication SET quantity_in_stock =  quantity_in_stock - 1 WHERE medication_id = :medication_id";
+        $update_med_stmt = $conn->prepare($update_medication);
+        $update_med_stmt->bindParam('medication_id', $med_id['medication_id']);
+        $update_med_stmt->execute();
+    }
     
     // update prescription status
     $update_prescription_sql = "UPDATE Prescription SET status = 'Dispensed' WHERE prescription_id = :prescription_id";
@@ -35,10 +47,12 @@ try
     $update_pharmacist_stmt->bindParam(':pharmacist_id', $pharmacist_id);
     $update_pharmacist_stmt->execute();
 
+    $conn->commit();   
 
     echo json_encode(["status" => "success", "message" => "Prescription dispense successfully"]);
 
 } catch (PDOException $e) {
+    $conn->rollBack();
     echo json_encode(["status" => "error", "message" => "Error: " . $e->getMessage()]);
 }
 

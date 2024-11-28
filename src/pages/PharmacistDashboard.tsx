@@ -52,6 +52,7 @@ const PharmacistDashboard = () => {
       });
       if (response.data) {
         setPrescription(response.data);
+        console.log(response.data);
       }
       console.log(response.data);
     } catch (error) {
