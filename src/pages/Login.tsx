@@ -15,6 +15,7 @@ import { useNavigate } from "react-router-dom";
 import Sidebar from "@/components/Sidebar";
 import axios from "axios";
 import { toast } from "sonner"; // Optional for notifications
+import { useEffect } from "react";
 
 // Input schema
 const formSchema = z.object({
@@ -32,6 +33,19 @@ const Login = () => {
       password: "",
     },
   });
+
+// In case that user not press logout button
+const handleLogout = async () => {
+    try {
+      const response = await axios.get("http://localhost:8081/logout.php");
+      console.log("Logout successful", response.data);
+    } catch (error) {
+      console.error("Error during logout:", error);
+    }
+  };
+  useEffect(() => {
+        handleLogout();
+    }, []);
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     console.log(values);
